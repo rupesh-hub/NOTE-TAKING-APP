@@ -9,7 +9,7 @@
 
 ## Repository Link
 
-- **GitHub Repository**: [GitHub Repo URL](https://github.com/rupesh-hub/NOTE-TAKING-APP/edit/master/README.md)
+- **GitHub Repository**: [GitHub Repo URL](https://github.com/rupesh-hub/NOTE-TAKING-APP/tree/master)
 
 ---
 

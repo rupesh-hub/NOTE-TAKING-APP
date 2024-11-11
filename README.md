@@ -44,22 +44,22 @@
 ## Journal / Developer Log
 
 ### Day 1
-- **[Date]**: Initial brainstorming, setup GitHub repository, assigned roles.
+- **[Monday, 11 November 2024]**: Initial brainstorming, setup GitHub repository, assigned roles.
 
 ### Day 2
-- **[Date]**: Completed initial design, reviewed requirements.
+- **[Tuesday, 12 November 2024]**: Completed initial design, reviewed requirements.
 
 ### Day 3
-- **[Date]**: Front end project setup and design.
+- **[Wednesday, 13 November 2024]**: Front end project setup and design.
 
 ### Day 4
-- **[Date]**: Working on UI design parts.
+- **[Thursday, 14 November 2024]**: Working on UI design parts.
 
 ### Day 5
-- **[Date]**: Backend project setup and working on user authentication and authorization.
+- **[Friday, 15 November 2024]**: Backend project setup and working on user authentication and authorization.
 
 ### Day 6
-- **[Date]**: Working on backend features (Projects, Notes, Roles, Assignment etc.).
+- **[Saturday, 16 November 2024]**: Working on backend features (Projects, Notes, Roles, Assignment etc.).
 
 ### Day 7
-- **[Date]**: Testing fully functional project and deployment.
+- **[Sunday, 17 November 2024]**: Testing fully functional project and deployment.

@@ -1,0 +1,20 @@
+@import '../assets/styles/variables';
+
+.button {
+  background-color: $primary-dark;
+  color: $white-color;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: $primary-color;
+  }
+
+  &:active {
+    background-color: $secondary-color;
+  }
+}

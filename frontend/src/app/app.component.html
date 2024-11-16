@@ -1,0 +1,33 @@
+<div *ngIf="isAuthenticated$ | async; else authLayout" class="layout-container">
+  <nav class="side-nav">
+    <nta-side-nav></nta-side-nav>
+  </nav>
+
+  <header class="header">
+    <div class="__left">Welcome back, <strong>{{authenticatedUser.name}} !</strong></div>
+    <div class="__right">
+      <div class="__message">
+        <fa-icon [icon]="faMessage"></fa-icon>
+        <p class="__badge">2</p>
+      </div>
+      <div class="__notification">
+        <fa-icon [icon]="faBell"></fa-icon>
+        <p class="__badge">1</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="content">
+    <router-outlet></router-outlet>
+  </main>
+
+  <footer class="footer">
+    <span>© 2021-2022 Note Taking Application™</span>
+  </footer>
+
+  <div class="overlay"></div>
+</div>
+
+<ng-template #authLayout>
+  <router-outlet></router-outlet>
+</ng-template>

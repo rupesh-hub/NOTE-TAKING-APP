@@ -1,0 +1,104 @@
+<div class="create-project-form">
+  <h2>Create new project!</h2>
+  <form #projectForm="ngForm" (ngSubmit)="saveProject()">
+    <div class="form-group">
+      <label for="projectName">Project name</label>
+      <input
+        type="text"
+        id="projectName"
+        name="projectName"
+        [(ngModel)]="projectName"
+        required
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="projectDeadline">Project deadline</label>
+      <input
+        type="datetime-local"
+        id="projectDeadline"
+        name="projectDeadline"
+        [(ngModel)]="projectDeadline"
+        required
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="assignedUsers" class="assigned-users-label">Assign users</label>
+      <div class="user-dropdown">
+        <input
+          type="text"
+          id="assignedUsers"
+          name="searchText"
+          [(ngModel)]="searchText"
+          (ngModelChange)="onSearchChange($event)"
+          (focus)="openDropdown()"
+          (blur)="onDropdownBlur()"
+          placeholder="Search user..."
+          class="search-input"
+        />
+        <ul *ngIf="isDropdownOpen" class="user-list">
+          <li
+            *ngFor="let user of filteredUsers"
+            (mousedown)="toggleUserSelection(user)"
+            class="user-item"
+          >
+            <div class="user-info" style="display: flex; justify-content: start; align-items: center;">
+              <img [src]="user.profile" [alt]="getFullName(user)" class="user-avatar" />
+              <span class="user-name">
+                {{ getFullName(user) }}
+                <span class="user-email">({{ user.email }})</span>
+              </span>
+            </div>
+            <span class="selection-indicator" [class.selected]="isUserSelected(user)">
+              <svg *ngIf="isUserSelected(user)" class="check-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+              </svg>
+            </span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <ng-container *ngIf="assignedUsers.length > 0">
+      <div class="form-group">
+        <label>Role assignments</label>
+        <div *ngFor="let user of assignedUsers" class="role-assignment">
+          <span class="user-name">{{ getFullName(user) }}</span>
+          <div class="role-dropdown">
+            <select
+              [id]="'roleSelect_' + user.id"
+              [(ngModel)]="collaborators.get(user.id!)!.authority"
+              (ngModelChange)="assignRole(user, $event)"
+              [name]="'roleSelect_' + user.id"
+              class="role-select"
+            >
+              <option value="">Select a role</option>
+              <option *ngFor="let authority of authorities" [value]="authority._id">
+                {{ authority.name }}
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-container *ngIf="assignedUsers.length > 0">
+      <div class="assigned-users">
+        <h3>Assigned Users:</h3>
+        <div class="user-images">
+          <div *ngFor="let user of assignedUsers" class="user-image">
+            <img [src]="user.profile" [alt]="getFullName(user)" [title]="getFullName(user)" />
+            <button type="button" class="remove-user" (click)="removeAssignedUser(user)">
+              &times;
+            </button>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <button type="submit" class="save-button" [disabled]="projectForm.invalid">
+      Save Project
+    </button>
+  </form>
+</div>

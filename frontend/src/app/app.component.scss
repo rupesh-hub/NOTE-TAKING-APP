@@ -1,0 +1,170 @@
+@import "../assets/styles/variables";
+
+/* Main container */
+.layout-container {
+  display: grid;
+  grid-template-areas:
+    "sidenav header"
+    "sidenav content"
+    "sidenav footer";
+  grid-template-columns: 300px 1fr;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+/* Sidebar navigation */
+.side-nav {
+  grid-area: sidenav;
+  border-right: 1px solid rgb(236, 234, 234);
+  height: 100%;
+  position: fixed;
+  width: 300px;
+  overflow-y: auto;
+}
+
+/* Header */
+.header {
+  grid-area: header;
+  position: sticky;
+  top: 0;
+  background-color: #fff;
+  height: 8vh;
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  padding: 0px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #f4f4f4;
+
+  .__left {
+    color: rgb(114, 113, 113);
+    font-weight: 400;
+  }
+
+  .__right {
+    display: flex;
+    gap: 10px;
+
+    .__message,
+    .__notification {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      height: 40px;
+      width: 40px;
+      background-color: rgb(248, 248, 248);
+      justify-content: center;
+      border-radius: 50%;
+
+      .__badge {
+        position: absolute;
+      }
+
+      fa-icon {
+        font-size: 16px;
+      }
+    }
+  }
+}
+
+.__badge {
+  top: -8px;
+  right: -8px;
+  background-color: #ff5733; // Badge color, adjust as needed
+  color: white;
+  font-size: 12px; // Adjust the font size
+  font-weight: bold;
+  border-radius: 50%;
+  padding: 5px 8px;
+  min-width: 18px;
+  text-align: center;
+  line-height: 1;
+}
+
+/* Main content */
+.content {
+  grid-area: content;
+  padding: 1.5rem;
+  overflow-y: auto;
+  min-height: calc(100vh - 120px); /* Adjust based on header/footer height */
+}
+
+/* Footer */
+.footer {
+  grid-area: footer;
+  padding: 1rem;
+  text-align: center;
+  // background-color: #f9f6f6;
+  border-top: 1px solid #e2e8f0;
+
+  span {
+    font-weight: 400;
+    color: rgb(97, 97, 97);
+    font-size: 14px;
+  }
+}
+
+/* Large screens (1200px and up) */
+@media screen and (min-width: 1200px) {
+  .layout-container {
+    grid-template-columns: 300px 1fr;
+  }
+}
+
+/* Medium screens (between 768px and 1199px) */
+@media screen and (max-width: 1199px) {
+  .layout-container {
+    grid-template-columns: 200px 1fr;
+  }
+
+  .side-nav {
+    width: 200px;
+  }
+}
+
+/* Small screens (less than 768px) */
+@media screen and (max-width: 767px) {
+  .layout-container {
+    grid-template-areas:
+      "header"
+      "content"
+      "footer";
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto;
+  }
+
+  .side-nav {
+    position: fixed;
+    left: -250px;
+    top: 0;
+    height: 100%;
+    width: 250px;
+    transition: left 0.3s ease;
+    z-index: 1000;
+  }
+
+  /* Class to show sidebar when active */
+  .side-nav.active {
+    left: 0;
+  }
+
+  /* Optional overlay for mobile when sidebar is open */
+  .overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+  }
+
+  .overlay.active {
+    display: block;
+  }
+}

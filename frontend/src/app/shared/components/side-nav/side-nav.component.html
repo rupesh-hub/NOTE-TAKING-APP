@@ -1,0 +1,119 @@
+<aside class="sidebar">
+  <div class="sidebar__top">
+    <div class="user-profile">
+      <img
+        [src]="authenticatedUser.profile"
+        [alt]="authenticatedUser.name"
+        height="60px"
+        width="60px"
+      />
+      <div class="user-profile__info">
+        <h3 class="user-profile__name">{{ authenticatedUser.name }}</h3>
+        <p class="user-profile__email">{{ authenticatedUser.email }}</p>
+      </div>
+    </div>
+
+    <div class="sidebar__main">
+      <button class="new-project-btn" (click)="navigateToCreateProject()">
+        <fa-icon [icon]="faPlus" />
+        New Project
+      </button>
+
+      <nav class="sidebar-nav">
+        <a
+          routerLink="/search"
+          routerLinkActive="sidebar-nav__link--active"
+          class="sidebar-nav__link"
+        >
+          <fa-icon [icon]="faSearch" />
+          <span>Search</span>
+        </a>
+        <a
+          routerLink="/home"
+          routerLinkActive="sidebar-nav__link--active"
+          class="sidebar-nav__link"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 512 512"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="32"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            style="height: 14px; width: 14px"
+          >
+            <path
+              d="M256 48l-192 192v224a48 48 0 0 0 48 48h128V320h128v192h128a48 48 0 0 0 48-48V240L256 48z"
+            />
+          </svg>
+          <span>Home</span>
+        </a>
+        <a
+          routerLink="/notes"
+          routerLinkActive="sidebar-nav__link--active"
+          class="sidebar-nav__link"
+        >
+          <fa-icon [icon]="faNoteSticky" />
+          <span>Notes</span>
+        </a>
+        <a
+          routerLink="/tasks"
+          routerLinkActive="sidebar-nav__link--active"
+          class="sidebar-nav__link"
+          style="margin-bottom: 10px"
+        >
+          <fa-icon [icon]="faCheckCircle" />
+          <span>Tasks</span>
+        </a>
+      </nav>
+
+      <div class="projects-section">
+        <div class="projects-section__header">
+          <div class="projects-section__title">
+            <fa-icon [icon]="faFolder" />
+            <span>Projects</span>
+          </div>
+          <button class="projects-section__toggle">
+            <fa-icon [icon]="faCaretSquareUp" style="font-size: 16px; font-weight: regular;" />
+          </button>
+        </div>
+        <nav class="projects-nav" *ngFor="let project of projects">
+          <a class="projects-nav__link" (click)="navigateToNote(project._id)" style="cursor: pointer;">
+            <span class="projects-nav__color projects-nav__color--purple"></span>
+            <span>{{project.name}}</span>
+          </a>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+  <div class="sidebar__bottom">
+    <nav class="sidebar-nav">
+      <a
+        routerLink="/support"
+        routerLinkActive="sidebar-nav__link--active"
+        class="sidebar-nav__link"
+      >
+        <fa-icon [icon]="faQuestionCircle" />
+        <span>Support</span>
+      </a>
+      <a
+        routerLink="/whats-new"
+        routerLinkActive="sidebar-nav__link--active"
+        class="sidebar-nav__link"
+      >
+        <fa-icon [icon]="faStarHalfAlt" />
+        <span>What's new</span>
+      </a>
+
+      <a
+        (click)="logout()"
+        class="sidebar-nav__link"
+      >
+        <fa-icon [icon]="faSignOutAlt" />
+        <span>Logout</span>
+      </a>
+    </nav>
+  </div>
+</aside>

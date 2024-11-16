@@ -1,0 +1,138 @@
+<div class="registration">
+  <div class="registration__header">Register here!</div>
+
+  <form
+    [formGroup]="registrationForm"
+    (ngSubmit)="onSubmit()"
+    class="registration__form"
+  >
+    <div class="grid-container">
+      <div class="form-group">
+        <label for="firstName">First Name</label>
+        <input type="text" id="firstName" formControlName="firstName" />
+        <div
+          *ngIf="
+            registrationForm.get('firstName')?.invalid &&
+            registrationForm.get('firstName')?.touched
+          "
+          class="error-message"
+        >
+          * First name is required and must be at least 2 characters.
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="lastName">Last Name</label>
+        <input type="text" id="lastName" formControlName="lastName" />
+        <div
+          *ngIf="
+            registrationForm.get('lastName')?.invalid &&
+            registrationForm.get('lastName')?.touched
+          "
+          class="error-message"
+        >
+          * Last name is required and must be at least 2 characters.
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="username">Username</label>
+      <input type="text" id="username" formControlName="username" />
+      <div
+        *ngIf="
+          registrationForm.get('username')?.hasError('forbiddenUsername') &&
+          registrationForm.get('username')?.touched
+        "
+        class="error-message"
+      >
+        * Username is forbidden.
+      </div>
+      <div
+        *ngIf="
+          registrationForm.get('username')?.hasError('minlength') &&
+          registrationForm.get('username')?.touched
+        "
+        class="error-message"
+      >
+        * Username must be at least 4 characters.
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input type="email" id="email" formControlName="email" />
+      <div
+        *ngIf="
+          registrationForm.get('email')?.invalid &&
+          registrationForm.get('email')?.touched
+        "
+        class="error-message"
+      >
+        * Please enter a valid email address.
+      </div>
+    </div>
+
+    <div class="grid-container">
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" formControlName="password" />
+        <div
+          *ngIf="
+            registrationForm.get('password')?.hasError('weakPassword') &&
+            registrationForm.get('password')?.touched
+          "
+          class="error-message"
+        >
+          * Password must include an uppercase letter, lowercase letter, number,
+          and special character.
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="confirmPassword">Confirm Password</label>
+        <input
+          type="password"
+          id="confirmPassword"
+          formControlName="confirmPassword"
+        />
+        <div
+          *ngIf="
+            registrationForm
+              .get('confirmPassword')
+              ?.hasError('passwordMismatch') &&
+            registrationForm.get('confirmPassword')?.touched
+          "
+          class="error-message"
+        >
+          * Passwords do not match.
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="profile">Profile</label>
+      <input type="file" id="profile" formControlName="profile" />
+    </div>
+
+    <div class="form-group">
+      <a
+        (click)="navigateToAuthentication()"
+        style="
+          font-size: 14px;
+          color: blue;
+          margin-bottom: 10px;
+          cursor: pointer;
+        "
+        >Already registered?</a
+      >
+      <button
+        type="submit"
+        class="register-button"
+        [disabled]="registrationForm.invalid"
+      >
+        Register
+      </button>
+    </div>
+  </form>
+</div>

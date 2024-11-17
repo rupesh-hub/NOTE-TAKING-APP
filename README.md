@@ -2,7 +2,7 @@
 
 ## Team Number: `GROUP 04`
 
-## Application Name: `NOTE-TAKING-APP`
+## Application Name: `COMPREHENSIVE NOTE-TAKING-APP`
 
 ## GitHub Repository: [[https://github.com/rupesh-hub/note-taking-app](https://github.com/rupesh-hub/NOTE-TAKING-APP)]
 

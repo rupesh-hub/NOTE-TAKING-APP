@@ -10,16 +10,45 @@ form {
   border-radius: 10px;
 }
 
-button {
-  margin-top: 10px;
+// button {
+//   margin-top: 10px;
+//   border: none;
+//   background-color: purple;
+//   color: #fff;
+//   font-weight: 600;
+//   border-radius: 10px;
+//   padding: 0.6rem 1.5rem;
+//   cursor: pointer;
+//   transition: background-color 0.3s;
+// }
+
+button{
+  margin-top: 1em;
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(
+    to right,
+    #7c5dfa,
+    lighten(#7c5dfa, 10%)
+  );
   border: none;
-  background-color: purple;
+  border-radius: 8px;
   color: #fff;
   font-weight: 600;
-  border-radius: 10px;
-  padding: 0.6rem 1.5rem;
-  cursor: pointer;
-  transition: background-color 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 24px;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+
+  .icon-plus {
+    font-size: 18px;
+  }
 }
 
 button:hover {

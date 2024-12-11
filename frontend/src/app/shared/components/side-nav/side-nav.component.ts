@@ -18,6 +18,7 @@ import {
   faStar,
   faFolder,
   faPlusSquare,
+  faUser
 } from '@fortawesome/free-regular-svg-icons';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
@@ -44,6 +45,7 @@ export class SideNavComponent implements OnInit {
   protected faCaretSquareUp = faAngleUp;
   protected faCaretSquareDown = faAngleDown;
   protected faSignOutAlt = faSignOutAlt;
+  protected faUser = faUser;
 
   private authService: AuthService = inject(AuthService);
   private projectService: ProjectService = inject(ProjectService);
@@ -83,4 +85,35 @@ export class SideNavComponent implements OnInit {
   protected navigateToNote(projectId: string): void {
     this.router.navigate([`/notes/${projectId}`]);
   }
+
+
+  // Main navigation items
+  mainNavItems = [
+    { icon: this.faSearch, label: 'Search', link: '/search' },
+    { 
+      icon: this.faHome, 
+      label: 'Home', 
+      link: '/home',
+      svgIcon: `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none" stroke="currentColor" stroke-width="32" stroke-linecap="round" stroke-linejoin="round" style="height: 14px; width: 14px">
+          <path d="M256 48l-192 192v224a48 48 0 0 0 48 48h128V320h128v192h128a48 48 0 0 0 48-48V240L256 48z"/>
+        </svg>
+      `
+    },
+    { icon: this.faCheckCircle, label: 'Tasks', link: '/tasks' },
+    { icon: this.faUser, label: 'Profile', link: '/profile' },
+  ];
+
+  // Bottom navigation items
+  bottomNavItems = [
+    { icon: this.faQuestionCircle, label: 'Support', link: '/support' },
+    { icon: this.faStarHalfAlt, label: "What's new", link: '/whats-new' },
+    { 
+      icon: this.faSignOutAlt, 
+      label: 'Logout', 
+      link: null, // No navigation
+      action: () => this.logout() // Callback function
+    }
+  ];
+
 }

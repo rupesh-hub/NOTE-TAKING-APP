@@ -19,6 +19,12 @@ const registerUser = asyncHandler(async (req, res) => {
   // Check if email is already taken
   const emailTaken = await User.findOne({ email });
   if (emailTaken) {
+    // If file was uploaded, delete it since registration will fail
+    if (req.file) {
+      fs.unlink(req.file.path, (err) => {
+        if (err) console.error('Error deleting file:', err);
+      });
+    }
     res.status(400);
     throw new Error("Email already taken.");
   }
@@ -26,6 +32,12 @@ const registerUser = asyncHandler(async (req, res) => {
   // Check if username is already taken
   const usernameTaken = await User.findOne({ username });
   if (usernameTaken) {
+    // If file was uploaded, delete it since registration will fail
+    if (req.file) {
+      fs.unlink(req.file.path, (err) => {
+        if (err) console.error('Error deleting file:', err);
+      });
+    }
     res.status(400);
     throw new Error("Username already taken.");
   }
@@ -43,15 +55,24 @@ const registerUser = asyncHandler(async (req, res) => {
     roleIds = [defaultRole._id];
   }
 
-  // Create user
-  const user = await User.create({
+  // Create user with profile image if uploaded
+  const userData = {
     firstName,
     lastName,
     username,
     email,
     password: hashPassword,
     roles: roleIds,
-  });
+  };
+
+  // Add profile image if file was uploaded
+  if (req.file) {
+    userData.profile = req.file.filename;
+  }
+
+  // Create user
+  const user = await User.create(userData);
+  console.log(user)
 
   // Send response
   if (user) {
@@ -61,16 +82,21 @@ const registerUser = asyncHandler(async (req, res) => {
       lastName: user.lastName,
       username: user.username,
       email: user.email,
+      profile: user.profile ? `${process.env.API_BASE_URL}/uploads/${user.profile}` : null
     });
   } else {
+    // If user creation failed and file was uploaded, delete it
+    if (req.file) {
+      fs.unlink(req.file.path, (err) => {
+        if (err) console.error('Error deleting file:', err);
+      });
+    }
     res.status(400);
     throw new Error("Something went wrong!");
   }
 });
 
-//@desc AUTHENTICATE USER
-//@route POST /api/v1.0.0/users/authenticate
-//@access public
+// Update the authentication response to include profile image
 const authenticateUser = asyncHandler(async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password) {
@@ -102,8 +128,10 @@ const authenticateUser = asyncHandler(async (req, res) => {
         lastName: user.lastName,
         email: user.email,
         username: user.username,
+        profile: user.profile ? `/api/v1.0.0/uploads//${user.profile}` : null
       },
     });
+    console.log(user)
   } else {
     res.status(400);
     throw new Error("Username or password is not valid!");

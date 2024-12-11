@@ -19,40 +19,54 @@ import { AuthService } from '../../services/auth.service';
   styleUrl: './register.component.scss',
 })
 export class RegisterComponent implements OnInit {
-  private authService:AuthService = inject(AuthService);
+  private authService: AuthService = inject(AuthService);
   registrationForm!: FormGroup;
+  fileError: string | null = null;
+  selectedFile: File | null = null;
+  previewUrl: string | null = null;
 
   constructor(private fb: FormBuilder, private router: Router) {}
 
-  ngOnInit(): void {
-    
-    this.authService.isAuthenticated$.subscribe((isAuthenticated) => {
-      if (isAuthenticated) {
-        this.router.navigate(['/home']);
-      }
-    });
+  onFileChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.fileError = null;
+    this.previewUrl = null;
 
-    this.registrationForm = this.fb.group(
-      {
-        firstName: ['', [Validators.required, Validators.minLength(2)]],
-        lastName: ['', [Validators.required, Validators.minLength(2)]],
-        username: [
-          '',
-          [
-            Validators.required,
-            Validators.minLength(4),
-            this.usernameValidator,
-          ],
-        ],
-        email: ['', [Validators.required, Validators.email]],
-        password: ['', [Validators.required, this.passwordValidator]],
-        confirmPassword: ['', [Validators.required]],
-        profile: [''],
-      },
-      {
-        validators: this.matchPasswords('password', 'confirmPassword'),
+    if (input?.files?.length) {
+      const file = input.files[0];
+
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        this.fileError = 'Only image files are allowed.';
+        input.value = '';
+        this.registrationForm.get('profile')?.setValue(null);
+        this.selectedFile = null;
+        return;
       }
-    );
+
+      // Validate file size (e.g., max 5MB)
+      const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+      if (file.size > maxSize) {
+        this.fileError = 'File size must not exceed 5MB.';
+        input.value = '';
+        this.registrationForm.get('profile')?.setValue(null);
+        this.selectedFile = null;
+        return;
+      }
+
+      // Store the file and create preview
+      this.selectedFile = file;
+      this.registrationForm.patchValue({ profile: file });
+      this.createImagePreview(file);
+    }
+  }
+
+  private createImagePreview(file: File): void {
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.previewUrl = reader.result as string;
+    };
+    reader.readAsDataURL(file);
   }
 
   // Custom Validator for Username
@@ -94,18 +108,67 @@ export class RegisterComponent implements OnInit {
     };
   }
 
-  // Method to handle form submission
-  onSubmit() {
-    if (this.registrationForm.valid) {
-      console.log('Registration Data:', this.registrationForm.value);
-      // Send the data to a service for API call here
-    } else {
-      console.log('Form is invalid');
-      this.registrationForm.markAllAsTouched(); // Show all errors if form is invalid
-    }
-  }
-
   navigateToAuthentication() {
     this.router.navigate(['/authentication']);
+  }
+
+  ngOnInit(): void {
+    this.authService.isAuthenticated$.subscribe((isAuthenticated) => {
+      if (isAuthenticated) {
+        this.router.navigate(['/home']);
+      }
+    });
+
+    this.registrationForm = this.fb.group(
+      {
+        firstName: ['', [Validators.required, Validators.minLength(2)]],
+        lastName: ['', [Validators.required, Validators.minLength(2)]],
+        username: [
+          '',
+          [
+            Validators.required,
+            Validators.minLength(4),
+            this.usernameValidator,
+          ],
+        ],
+        email: ['', [Validators.required, Validators.email]],
+        password: ['', [Validators.required, this.passwordValidator]],
+        confirmPassword: ['', [Validators.required]],
+        profile: [null],
+      },
+      {
+        validators: this.matchPasswords('password', 'confirmPassword'),
+      }
+    );
+  }
+
+  onSubmit() {
+    if (this.registrationForm.valid) {
+      const formData = new FormData();
+      const formValue = this.registrationForm.getRawValue();
+
+      formData.append('firstName', formValue.firstName);
+      formData.append('lastName', formValue.lastName);
+      formData.append('username', formValue.username);
+      formData.append('email', formValue.email);
+      formData.append('password', formValue.password);
+
+      // Only append profile if a file was selected
+      if (this.selectedFile) {
+        formData.append('profile', this.selectedFile, this.selectedFile.name);
+      }
+
+      this.authService.register(formData).subscribe({
+        next: () => {
+          this.router.navigate(['/login']);
+        },
+        error: (error) => {
+          console.error('Registration failed', error);
+        },
+      });
+    } else {
+      this.registrationForm.markAllAsTouched();
+      console.log('Form is invalid', this.registrationForm.errors);
+    }
   }
 }

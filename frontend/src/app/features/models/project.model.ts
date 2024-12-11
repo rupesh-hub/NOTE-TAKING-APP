@@ -1,36 +1,37 @@
 export interface Project {
-  id: string;
+  _id: string;
   name: string;
   description: string;
-  createdBy: any;
+  createdBy: User;
   createdAt: string;
-  updatedBy: any;
+  updatedBy: User;
   updatedAt: string;
-  collaborators: any;
+  collaborators: Collaborator;
   notes: any;
+  draft: any;
 }
 
 export interface Collaborator {
-  id: string;
+  _id: string;
   userId: string;
   authorities: any;
   createdAt: string;
-  createdBy: any;
+  createdBy: User;
   updatedAt: string;
-  updatedBy: any;
+  updatedBy: User;
 }
 
 export interface Note {
-  id: string;
+  _id: string;
   title: string;
   content: string;
-  images: any;
-  urls: any;
-  createdBy: any;
+  images: [];
+  urls: [];
+  createdBy: User;
   createdAt: string;
-  modifiedBy: any;
+  modifiedBy: User;
   modifiedAt: string;
-  project: any;
+  project: string;
 }
 
 export interface Authority {
@@ -43,4 +44,37 @@ export interface Permission {
   id: string;
   name: string;
   description: string;
+}
+
+export interface User {
+  profile: string;
+  _id: string;
+  firstName: string;
+  lastName: string;
+  username: string;
+  email: string;
+}
+
+export interface Draft {
+  _id: string;
+  title: string;
+  content: string;
+  urls: [];
+  images: [];
+  createdBy: User;
+  modifiedBy: User;
+  createdAt: string;
+  modifiedAt: string;
+  project: string;
+}
+
+export interface Image {
+  _id: string;
+  url: string;
+  alt: string;
+  draft: string;
+  createdBy: User;
+  modifiedBy: User;
+  createdAt: string;
+  moodifiedAt: string;
 }

@@ -2,6 +2,11 @@ const express = require("express");
 const Project = require("../models/ProjectModel");
 const Note = require("../models/NoteModel");
 const Collaborator = require("../models/CollaboratorModel");
+const Draft = require("../models/DraftModel");
+const Image = require("../models/ImageModel");
+const { Authority, Permission } = require("../models/AuthorityModel");
+const mongoose = require('mongoose');
+
 const {
   authenticate,
   checkPermission,
@@ -96,24 +101,114 @@ router.get("/", async (req, res) => {
   }
 });
 
+// Get a specific project along with its notes checkPermission("view_project"),
 // Get a specific project along with its notes
-router.get("/:id", checkPermission("view_project"), async (req, res) => {
+router.get("/:id", async (req, res) => {
   try {
     // Fetch the project with collaborators
-    const project = await Project.findById(req.params.id).populate(
-      "collaborators"
-    );
+    const project = await Project.findById(req.params.id)
+      .populate({
+        path: "collaborators",
+        populate: {
+          path: "userId",
+          select: "firstName lastName username email profile",
+        },
+      })
+      .populate({
+        path: "createdBy updatedBy",
+        select: "firstName lastName username email profile",
+      });
+
     if (!project) {
       return res.status(404).json({ message: "Project not found" });
     }
 
     // Fetch all notes associated with the project
-    const notes = await Note.find({ project: req.params.id });
+    const notes = await Note.find({ project: req.params.id }).populate(
+      "createdBy modifiedBy",
+      "firstName lastName username email profile"
+    );
 
-    // Send the project along with the notes
-    res.json({ project, notes });
+    // Fetch all drafts associated with the project
+    const drafts = await Draft.find({ project: req.params.id }).populate(
+      "createdBy modifiedBy",
+      "firstName lastName username email profile"
+    );
+
+    // Fetch all images for each draft
+    const draftsWithImages = await Promise.all(
+      drafts.map(async (draft) => {
+        const images = await Image.find({ draft: draft._id }).populate(
+          "createdBy",
+          "firstName lastName username email profile"
+        );
+        return {
+          ...safeToObject(draft),
+          images: images.map(safeToObject),
+        };
+      })
+    );
+
+    // Fetch and populate authorities and permissions for collaborators
+    const populatedCollaborators = await Promise.all(
+      (project.collaborators || []).map(async (collaborator) => {
+        if (!collaborator) return null;
+        const populatedAuthorities = await Authority.find({
+          _id: { $in: collaborator.authorities || [] },
+        }).populate("permissions");
+        return {
+          ...safeToObject(collaborator),
+          userId: safeToObject(collaborator.userId),
+          authorities: populatedAuthorities.map(safeToObject),
+        };
+      })
+    ).then((collaborators) => collaborators.filter(Boolean));
+
+    // Helper function to safely convert to object
+    function safeToObject(doc) {
+      if (doc === null || doc === undefined) {
+        return null;
+      }
+      if (doc instanceof mongoose.Document) {
+        return doc.toObject();
+      }
+      if (typeof doc === "object" && !Array.isArray(doc)) {
+        return { ...doc };
+      }
+      return doc;
+    }
+
+    // Construct the final response
+    const response = {
+      project: {
+        ...safeToObject(project),
+        collaborators: populatedCollaborators,
+        createdBy: safeToObject(project.createdBy),
+        updatedBy: safeToObject(project.updatedBy),
+      },
+      notes: notes.map((note) => ({
+        ...safeToObject(note),
+        createdBy: safeToObject(note.createdBy),
+        modifiedBy: safeToObject(note.modifiedBy),
+      })),
+      drafts: draftsWithImages.map((draft) => ({
+        ...draft,
+        createdBy: safeToObject(draft.createdBy),
+        modifiedBy: safeToObject(draft.modifiedBy),
+        images: (draft.images || []).map((image) => ({
+          ...image,
+          createdBy: safeToObject(image.createdBy),
+        })),
+      })),
+    };
+
+    // Send the project along with all associated data
+    res.json(response);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Error in project route:", error);
+    res
+      .status(500)
+      .json({ message: "An error occurred while fetching project data" });
   }
 });
 

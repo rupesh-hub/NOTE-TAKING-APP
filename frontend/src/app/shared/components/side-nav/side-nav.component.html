@@ -1,118 +1,87 @@
-<aside class="sidebar">
-  <div class="sidebar__top">
-    <div class="user-profile">
-      <img
-        [src]="authenticatedUser.profile"
-        [alt]="authenticatedUser.name"
-        height="60px"
-        width="60px"
-      />
-      <div class="user-profile__info">
-        <h3 class="user-profile__name">{{ authenticatedUser.name }}</h3>
-        <p class="user-profile__email">{{ authenticatedUser.email }}</p>
-      </div>
-    </div>
+<aside class="fixed left-0 top-0 h-full w-72 bg-white flex flex-col border-r">
+  <!-- Top Section -->
+  <div class="p-4 border-b border-gray-200">
+    <div class="flex items-center space-x-4 overflow-auto scrollbar-thin scrollbar-thumb-[#8B9F82] scrollbar-track-gray-100 pb-2">
+      
+        <img
+          [src]="authenticatedUser.profile"
+          [alt]="authenticatedUser.name"
+          class="w-12 h-12 rounded-full object-cover flex-shrink-0"
+        />
 
-    <div class="sidebar__main">
-      <button class="new-project-btn" (click)="navigateToCreateProject()">
-        <fa-icon [icon]="faPlus" />
-        New Project
-      </button>
-
-      <nav class="sidebar-nav">
-        <a
-          routerLink="/search"
-          routerLinkActive="sidebar-nav__link--active"
-          class="sidebar-nav__link"
-        >
-          <fa-icon [icon]="faSearch" />
-          <span>Search</span>
-        </a>
-        <a
-          routerLink="/home"
-          routerLinkActive="sidebar-nav__link--active"
-          class="sidebar-nav__link"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 512 512"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="32"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            style="height: 14px; width: 14px"
-          >
-            <path
-              d="M256 48l-192 192v224a48 48 0 0 0 48 48h128V320h128v192h128a48 48 0 0 0 48-48V240L256 48z"
-            />
-          </svg>
-          <span>Home</span>
-        </a>
-        <a
-          routerLink="/notes"
-          routerLinkActive="sidebar-nav__link--active"
-          class="sidebar-nav__link"
-        >
-          <fa-icon [icon]="faNoteSticky" />
-          <span>Notes</span>
-        </a>
-        <a
-          routerLink="/tasks"
-          routerLinkActive="sidebar-nav__link--active"
-          class="sidebar-nav__link"
-          style="margin-bottom: 10px"
-        >
-          <fa-icon [icon]="faCheckCircle" />
-          <span>Tasks</span>
-        </a>
-      </nav>
-
-      <div class="projects-section">
-        <div class="projects-section__header">
-          <div class="projects-section__title">
-            <fa-icon [icon]="faFolder" />
-            <span>Projects</span>
-          </div>
-          <button class="projects-section__toggle">
-            <fa-icon [icon]="faCaretSquareUp" style="font-size: 16px; font-weight: regular;" />
-          </button>
-        </div>
-        <nav class="projects-nav" *ngFor="let project of projects">
-          <a class="projects-nav__link" (click)="navigateToNote(project._id)" style="cursor: pointer;">
-            <span class="projects-nav__color projects-nav__color--purple"></span>
-            <span>{{project.name}}</span>
-          </a>
-        </nav>
+      <div class="min-w-0 flex-grow">
+        <h3 class="font-semibold text-gray-800 truncate">
+          {{ authenticatedUser.name }}
+        </h3>
+        <p class="text-sm text-gray-500 truncate">
+          {{ authenticatedUser.email }}
+        </p>
       </div>
     </div>
   </div>
 
-  <div class="sidebar__bottom">
-    <nav class="sidebar-nav">
+  <!-- Main Navigation -->
+  <div class="flex-grow px-4 py-6 space-y-2">
+    <button
+      (click)="navigateToCreateProject()"
+      class="w-full bg-[#8B9F82] text-white py-2 rounded-lg flex items-center justify-center space-x-2 hover:bg-opacity-90 transition-colors"
+    >
+      <fa-icon [icon]="faPlus" />
+      <span>New Project</span>
+    </button>
+ 
+    <nav class="space-y-2 mt-4">
       <a
-        routerLink="/support"
-        routerLinkActive="sidebar-nav__link--active"
-        class="sidebar-nav__link"
+        *ngFor="let item of mainNavItems"
+        [routerLink]="item.link"
+        routerLinkActive="bg-gray-100 text-[#8B9F82]"
+        class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors h-[45px]"
       >
-        <fa-icon [icon]="faQuestionCircle" />
-        <span>Support</span>
+        <fa-icon [icon]="item.icon" />
+        <span>{{ item.label }}</span>
       </a>
-      <a
-        routerLink="/whats-new"
-        routerLinkActive="sidebar-nav__link--active"
-        class="sidebar-nav__link"
-      >
-        <fa-icon [icon]="faStarHalfAlt" />
-        <span>What's new</span>
-      </a>
+    </nav>
 
-      <a
-        (click)="logout()"
-        class="sidebar-nav__link"
+    <!-- Projects Section -->
+    <div class=" pt-6">
+      <div class="flex justify-between items-center mb-4">
+        <div class="flex items-center space-x-2 text-gray-700">
+          <fa-icon [icon]="faFolder" />
+          <span class="font-semibold">Projects</span>
+        </div>
+        <button class="text-gray-500 hover:text-gray-700">
+          <fa-icon [icon]="faCaretSquareUp" />
+        </button>
+      </div>
+
+      <!-- Scrollable Project List -->
+      <div
+        class="max-h-52 overflow-y-auto space-y-1 scrollbar-thin scrollbar-thumb-[#8B9F82] scrollbar-track-gray-100"
       >
-        <fa-icon [icon]="faSignOutAlt" />
-        <span>Logout</span>
+        <a
+          *ngFor="let project of projects"
+          (click)="navigateToNote(project._id)"
+          class="text-sm flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100 cursor-pointer"
+        >
+          <span class="w-3 h-3 rounded-full bg-[#8B9F82] inline-block"></span>
+          <span>{{ project.name }}</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Navigation -->
+  <div class="border-t border-gray-200 p-4">
+    <nav class="space-y-2">
+      <a
+        *ngFor="let item of bottomNavItems"
+        [routerLink]="item.link"
+        routerLinkActive="bg-gray-100 text-[#8B9F82]"
+        class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors cursor-pointer"
+        (click)="item.action()"
+      >
+        <fa-icon [icon]="item.icon" />
+        <span>{{ item.label }}</span>
       </a>
     </nav>
   </div>

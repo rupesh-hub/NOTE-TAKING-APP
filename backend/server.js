@@ -1,10 +1,12 @@
 const express = require("express");
 const errorHandler = require("./middleware/ErrorHandler");
 const connectDb = require("./config/DbConnection");
+const upload = require('./config/FileUpload');
 const Role = require("./models/RoleModel");
 const { Permission, Authority } = require('./models/AuthorityModel');
-const dotenv = require("dotenv").config();
+require("dotenv").config();
 const cors = require('cors');
+const path = require('path');
 
 // CORS configuration
 const corsOptions = {
@@ -19,10 +21,15 @@ const app = express();
 app.use(cors(corsOptions));
 const port = process.env.PORT || 3001;
 
+// app.use('/uploads', express.static('uploads')); 
+// Serve static files
+app.use('/api/v1.0.0/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // MIDDLEWARE
 app.use(express.json());
 app.use("/api/v1.0.0/notes", require("./routes/NoteRoutes"));
-app.use("/api/v1.0.0/users", require("./routes/UserRoutes"));
+app.use("/api/v1.0.0/drafts", upload.array('images', 10), require("./routes/DraftRoutes"));
+app.use("/api/v1.0.0/users",upload.single('profile'), require("./routes/UserRoutes"));
 app.use("/api/v1.0.0/projects", require("./routes/ProjectRoutes"));
 app.use(errorHandler);
 

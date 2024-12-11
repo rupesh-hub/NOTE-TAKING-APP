@@ -1,32 +1,68 @@
-<div *ngIf="isAuthenticated$ | async; else authLayout" class="layout-container">
-  <nav class="side-nav">
-    <nta-side-nav></nta-side-nav>
-  </nav>
 
-  <header class="header">
-    <div class="__left">Welcome back, <strong>{{authenticatedUser.name}} !</strong></div>
-    <div class="__right">
-      <div class="__message">
-        <fa-icon [icon]="faMessage"></fa-icon>
-        <p class="__badge">2</p>
+<ng-container *ngIf="isAuthenticated$ | async; else authLayout">
+  <div
+    class="grid grid-cols-[288px_1fr] grid-rows-[auto_1fr_auto] min-h-screen"
+  >
+    <!-- Side Navigation -->
+    <nav
+      class="fixed w-[300px] h-full z-50 max-md:left-[-250px] max-md:transition-all max-md:duration-300 max-md:ease-in-out max-md:z-[1000]"
+    >
+      <nta-side-nav></nta-side-nav>
+    </nav>
+
+    <!-- Header -->
+    <header
+      class="sticky top-0 bg-white h-[8vh] px-5 flex justify-between items-center border-b border-gray-100 col-start-2"
+    >
+      <div class="text-gray-600 font-normal">
+        Welcome back, <strong>{{ authenticatedUser.name }}!</strong>
       </div>
-      <div class="__notification">
-        <fa-icon [icon]="faBell"></fa-icon>
-        <p class="__badge">1</p>
+
+      <div class="flex gap-2">
+        <div
+          class="relative inline-flex items-center h-10 w-10 bg-gray-50 rounded-full justify-center"
+        >
+          <fa-icon [icon]="faMessage" class="text-base"></fa-icon>
+          <span
+            class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full px-2 py-1 min-w-[18px] inline-block text-center leading-none"
+          >
+            2
+          </span>
+        </div>
+
+        <div
+          class="relative inline-flex items-center h-10 w-10 bg-gray-50 rounded-full justify-center"
+        >
+          <fa-icon [icon]="faBell" class="text-base"></fa-icon>
+          <span
+            class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full px-2 py-1 min-w-[18px] inline-block text-center leading-none"
+          >
+            1
+          </span>
+        </div>
       </div>
-    </div>
-  </header>
+    </header>
 
-  <main class="content">
-    <router-outlet></router-outlet>
-  </main>
+    <!-- Main Content -->
+    <main class="p-6 min-h-[calc(100vh-120px)] col-start-2 row-start-2">
+      <router-outlet></router-outlet>
+    </main>
 
-  <footer class="footer">
-    <span>© 2021-2022 Note Taking Application™</span>
-  </footer>
+    <!-- Footer -->
+    <footer
+      class="border-t border-gray-200 flex justify-center items-center p-4 col-start-2 row-start-3"
+    >
+      <span class="text-sm text-gray-600 font-normal">
+        © 2021-2022 Note Taking Application™
+      </span>
+    </footer>
 
-  <div class="overlay"></div>
-</div>
+    <!-- Mobile Overlay -->
+    <div
+      class="fixed inset-0 bg-black/50 z-40 hidden max-md:block max-md:opacity-0 transition-opacity duration-300"
+    ></div>
+  </div>
+</ng-container>
 
 <ng-template #authLayout>
   <router-outlet></router-outlet>

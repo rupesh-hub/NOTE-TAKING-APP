@@ -1,6 +1,5 @@
 <div class="container">
   <div class="editor">
-    <!-- PROJECT AND NOTES -->
     <div
       style="
         width: 100%;
@@ -39,7 +38,6 @@
           </div>
         </div>
         <h3 class="title">{{ note.title }}</h3>
-        <!-- <p class="description">{{ note.content }}</p> -->
         <nta-html-viewer [rawContent]="note.content"></nta-html-viewer>
 
         <div class="tags">
@@ -62,7 +60,6 @@
         style="
           width: 100%;
           border: none;
-          background: purple;
           padding: 0.7rem 1rem;
           color: #fff;
           font-weight: 500;
@@ -77,7 +74,6 @@
 
   <div class="drafts">
     <div class="top">
-      <!-- Input for the draft content -->
       <input
         type="text"
         placeholder="Write a draft note"
@@ -85,31 +81,31 @@
         (keyup.enter)="saveDraft()"
         style="background-color: #fff"
       />
-      <!-- Image upload icon -->
-      <fa-icon [icon]="faFileImage" (click)="openImageUpload()"></fa-icon>
+      <fa-icon [icon]="faFileImage" (click)="fileInput.click()"></fa-icon>
+      <input
+        #fileInput
+        type="file"
+        (change)="onFileSelected($event)"
+        style="display: none;"
+        accept="image/*"
+        multiple
+      />
     </div>
 
     <ng-container *ngFor="let note of draftNotes; let i = index">
       <div class="notes">
         <div class="header">
-          <p class="date">{{ note.date | date : "medium" }}</p>
+          <p class="date">{{ note.createdAt | date : "medium" }}</p>
           <div class="end">
-            <!-- Delete icon -->
-            <fa-icon [icon]="faTrashAlt" (click)="deleteDraft(i)"></fa-icon>
-            <!-- Edit icon -->
+            <fa-icon [icon]="faTrashAlt" (click)="deleteDraft(note._id, i)"></fa-icon>
             <fa-icon [icon]="faEdit" (click)="editDraft(note)"></fa-icon>
           </div>
         </div>
         <div class="content">
-          <!-- Display the text content -->
           <p>{{ note.content }}</p>
-          <!-- Display image if available -->
-          <img
-            *ngIf="note.image"
-            [src]="note.image"
-            alt="Draft Image"
-            class="draft-image"
-          />
+          <ng-container *ngIf="note.images && note.images.length > 0">
+            <img *ngFor="let image of note.images" [src]="image" alt="Draft Image" class="draft-image" />
+          </ng-container>
         </div>
       </div>
     </ng-container>

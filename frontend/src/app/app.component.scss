@@ -17,11 +17,11 @@
 /* Sidebar navigation */
 .side-nav {
   grid-area: sidenav;
-  border-right: 1px solid rgb(236, 234, 234);
-  height: 100%;
+  // border-right: 1px solid rgb(236, 234, 234);
+  // height: 100%;
   position: fixed;
-  width: 300px;
-  overflow-y: auto;
+  // width: 300px;
+  // overflow-y: auto;
 }
 
 /* Header */
@@ -97,9 +97,12 @@
 .footer {
   grid-area: footer;
   padding: 1rem;
-  text-align: center;
+  // text-align: center;
   // background-color: #f9f6f6;
   border-top: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
   span {
     font-weight: 400;

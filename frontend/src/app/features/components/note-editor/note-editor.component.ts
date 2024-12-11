@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, inject } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -15,6 +15,7 @@ import { ProjectService } from '../../services/project.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ProjectCardComponent } from '../../../shared/pages/project-card.component';
 import { HtmlViewerComponent } from '../../../shared/pages/html-viewer.component';
+import { DraftService } from '../../drafts/draft.service';
 
 @Component({
   selector: 'nta-note-editor',
@@ -35,16 +36,24 @@ import { HtmlViewerComponent } from '../../../shared/pages/html-viewer.component
   styleUrl: './note-editor.component.scss',
 })
 export class NoteEditorComponent implements OnInit {
+  @ViewChild('fileInput') fileInput: ElementRef;
   faFileImage = faImage;
   faTrashAlt = faTrashAlt;
   faEdit = faEdit;
 
-  myForm: FormGroup;
+
   newDraftContent: string = '';
+  draftNotes: any[] = [];
+  selectedFiles: File[] = [];
+
+  myForm: FormGroup;
   editedIndex: number | null = null;
   protected projectId: string;
   protected project: any;
   protected notes: any;
+  protected draftTitle: string;
+
+  private draftService: DraftService = inject(DraftService);
 
   constructor(
     private formBuilder: FormBuilder,
@@ -68,6 +77,8 @@ export class NoteEditorComponent implements OnInit {
       next: (response: any) => {
         this.project = response.project;
         this.notes = response.notes;
+        this.draftNotes = response.drafts;
+        console.log(response)
       },
       error: (error: HttpErrorResponse) => {
         console.log(error);
@@ -83,18 +94,16 @@ export class NoteEditorComponent implements OnInit {
 
         this.notes.unshift({
           createAt: response.createAt,
-          _id:response._id,
-          content:response.content,
-          title:response.title
-        }); 
+          _id: response._id,
+          content: response.content,
+          title: response.title,
+        });
         this.myForm.reset();
-        
       },
       error: (error: HttpErrorResponse) => {
         console.log(error);
       },
     });
-  
   }
 
   editorInit = {
@@ -125,41 +134,48 @@ export class NoteEditorComponent implements OnInit {
     branding: false,
   };
 
-  draftNotes: any = [
-    {
-      content: 'Draft content for the third note. Almost done!',
-      date: new Date().toISOString(),
-    },
-    {
-      content:
-        "The fourth draft is now taking shape, but there are still some major revisions to be made. I've been thinking about how to improve the flow of the introduction, as it seems a bit too abrupt. The body paragraphs also need better transitions to guide the reader through the ideas more smoothly. Overall, the content is solid, but it could use a clearer structure and more supporting details to back up the main arguments. I plan to revisit this in the coming days with fresh ideas.",
-      date: new Date().toISOString(),
-    },
-    {
-      content:
-        "In this fifth draft, I've gone over the first section and reworked several sentences to make the meaning clearer. The second section still needs a lot of work, especially the conclusion. I feel like it's too weak and doesn't effectively summarize the main points of the article.",
-      date: new Date().toISOString(),
-    },
-  ];
+  onFileSelected(event: any): void {
+    this.selectedFiles = event.target.files;
+  }
 
-  protected saveDraft() {
-    if (this.newDraftContent.trim()) {
-      const newNote = {
-        content: this.newDraftContent.trim(),
-        date: new Date().toISOString(), // Current date and time
-      };
+  saveDraft(): void {
+    if (this.newDraftContent.trim() || this.selectedFiles.length > 0) {
+      const formData = new FormData();
+      formData.append('content', this.newDraftContent.trim());
+      formData.append('projectId', this.projectId);
 
-      // Add the new note at the top of the draft notes array
-      this.draftNotes.unshift(newNote);
+      for (let i = 0; i < this.selectedFiles.length; i++) {
+        formData.append('images', this.selectedFiles[i]);
+      }
 
-      // Clear the input field
-      this.newDraftContent = '';
+      this.draftService.create(formData).subscribe({
+        next: (response: any) => {
+          console.log('Draft saved:', response);
+          this.draftNotes.unshift(response);
+          this.newDraftContent = '';
+          this.selectedFiles = [];
+          this.fileInput.nativeElement.value = '';
+        },
+        error: (error: HttpErrorResponse) => {
+          console.error('Error saving draft:', error);
+        }
+      });
     }
   }
 
   // Method to delete a draft note
-  deleteDraft(index: number) {
-    this.draftNotes.splice(index, 1); // Remove the note at the specified index
+  deleteDraft(id: string, index: number) {
+    this.draftService.delete(id).subscribe({
+      next: (response: any) => {
+        console.log(response);
+      },
+      error: (error: HttpErrorResponse) => {
+        console.log(error);
+      },
+      complete: () => {
+        this.draftNotes.splice(index, 1); // Remove the note at the specified index
+      },
+    });
   }
 
   // Method to edit a draft note
@@ -168,32 +184,32 @@ export class NoteEditorComponent implements OnInit {
     this.editedIndex = this.draftNotes.indexOf(note); // Store the index of the note being edited
   }
 
-  openImageUpload() {
-    const input = document.createElement('input');
-    input.setAttribute('type', 'file');
-    input.setAttribute('accept', 'image/*');
+  // openImageUpload() {
+  //   const input = document.createElement('input');
+  //   input.setAttribute('type', 'file');
+  //   input.setAttribute('accept', 'image/*');
 
-    // Handle file selection
-    input.onchange = () => {
-      const file = input.files?.[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = () => {
-          // Add image to the most recent draft note
-          const imageUrl = reader.result as string;
-          const newNote = {
-            content: this.newDraftContent.trim(),
-            date: new Date().toISOString(),
-            image: imageUrl, // Store the image URL
-          };
-          this.draftNotes.unshift(newNote); // Add image content to the top of the list
-          this.newDraftContent = ''; // Clear the input field
-        };
-        reader.readAsDataURL(file); // Convert file to base64 string
-      }
-    };
-    input.click(); // Open the file picker
-  }
+  //   // Handle file selection
+  //   input.onchange = () => {
+  //     const file = input.files?.[0];
+  //     if (file) {
+  //       const reader = new FileReader();
+  //       reader.onload = () => {
+  //         // Add image to the most recent draft note
+  //         const imageUrl = reader.result as string;
+  //         const newNote = {
+  //           content: this.newDraftContent.trim(),
+  //           date: new Date().toISOString(),
+  //           image: imageUrl, // Store the image URL
+  //         };
+  //         this.draftNotes.unshift(newNote); // Add image content to the top of the list
+  //         this.newDraftContent = ''; // Clear the input field
+  //       };
+  //       reader.readAsDataURL(file); // Convert file to base64 string
+  //     }
+  //   };
+  //   input.click(); // Open the file picker
+  // }
 
   protected deleteNote(id: string) {
     this.projectService.deleteNote(id).subscribe({

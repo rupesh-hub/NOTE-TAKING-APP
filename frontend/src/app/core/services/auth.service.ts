@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { BehaviorSubject, Observable, Subject, tap } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, of, tap } from 'rxjs';
 import { environment } from '../../../environments/environment.development';
 import { Authority, UserFilterResponse } from '../models/auth-model';
 
@@ -9,13 +9,11 @@ import { Authority, UserFilterResponse } from '../models/auth-model';
   providedIn: 'root',
 })
 export class AuthService {
-  private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
-  isAuthenticated$: Observable<boolean> =
-    this.isAuthenticatedSubject.asObservable();
 
-  private filteredUsersSubject = new BehaviorSubject<
-    UserFilterResponse[] | null
-  >(null);
+  private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
+  isAuthenticated$: Observable<boolean> = this.isAuthenticatedSubject.asObservable();
+
+  private filteredUsersSubject = new BehaviorSubject<UserFilterResponse[] | null>(null);
   filteredUsers$ = this.filteredUsersSubject.asObservable();
 
   private router: Router = inject(Router);
@@ -35,13 +33,7 @@ export class AuthService {
         tap({
           next: (response) => {
             if (response && response.access_token) {
-              localStorage.setItem('auth_token', response.access_token);
-              localStorage.setItem(
-                'name',
-                response?.user?.firstName + ' ' + response?.user?.lastName
-              );
-              localStorage.setItem('username', response?.user?.username);
-              localStorage.setItem('email', response?.user?.email);
+              this.storeToLocalStorage(response);
               this.isAuthenticatedSubject.next(true);
               this.router.navigate(['/home']);
             } else {
@@ -105,12 +97,64 @@ export class AuthService {
     return this.httpClient.get<any>(`${environment.API_URL}/users/authorities`);
   }
 
+  public register(formData: any): Observable<any> {
+    return this.httpClient.post(
+      `${environment.API_URL}/users/register`,
+      formData
+    );
+  }
+
   public authenticatedUser(): any {
+    const profile = localStorage.getItem('profile');
     return {
       name: localStorage.getItem('name'),
       username: localStorage.getItem('username'),
       email: localStorage.getItem('email'),
-      profile: 'https://cdn.pixabay.com/photo/2021/06/04/10/29/man-6309454_640.jpg'
+      profile: this.getProfile(profile)
     };
   }
+
+  public updateUser(){
+
+  }
+
+  public changeProfile(){
+
+  }
+
+  public changePassword(){
+
+  }
+
+  public forgetPassword(){
+
+  }
+
+  public changePasswordRequest(){
+
+  }
+
+  public forgetPasswordRequest(){
+
+  }
+
+  public viewProfile(){
+
+  }
+
+  private getProfile(profilePath: any): any {
+    if (!profilePath || profilePath.trim() === '') {
+      return 'https://e1.pngegg.com/pngimages/45/989/png-clipart-flader-82-default-icons-for-apple-app-mac-os-x-notes-yellow-and-white-note-art-thumbnail.png'; // Provide a default image path
+    }
+    return profilePath;
+  }  
+
+  private storeToLocalStorage(response: any) {
+    localStorage.setItem('auth_token', response.access_token);
+    localStorage.setItem('name', response.user.firstName + ' ' + response.user.lastName);
+    localStorage.setItem('username', response.user.username);
+    localStorage.setItem('email', response.user.email);
+    localStorage.setItem('profile', response.user.profile);
+  }
+
 }

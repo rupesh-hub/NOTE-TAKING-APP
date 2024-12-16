@@ -7,12 +7,19 @@
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
-          "style": "scss"
+          "style": "scss",
+          "standalone": false
+        },
+        "@schematics/angular:directive": {
+          "standalone": false
+        },
+        "@schematics/angular:pipe": {
+          "standalone": false
         }
       },
       "root": "",
       "sourceRoot": "src",
-      "prefix": "nta",
+      "prefix": "ccnta",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:application",
@@ -28,33 +35,8 @@
                 "glob": "**/*",
                 "input": "public"
               },
-              {
-                "glob": "**/*",
-                "input": "node_modules/tinymce",
-                "output": "/tinymce/"
-              },
-              {
-                "glob": "**/*",
-                "input": "node_modules/tinymce/icons",
-                "output": "/tinymce/icons"
-              },
-              {
-                "glob": "**/*",
-                "input": "node_modules/tinymce/plugins",
-                "output": "/tinymce/plugins"
-              },
-              {
-                "glob": "**/*",
-                "input": "node_modules/tinymce/skins",
-                "output": "/tinymce/skins"
-              },
-              {
-                "glob": "**/*",
-                "input": "node_modules/tinymce/themes",
-                "output": "/tinymce/themes"
-              }
+              "src/assets"
             ],
-
             "styles": ["src/styles.scss"],
             "scripts": []
           },
@@ -116,7 +98,8 @@
               {
                 "glob": "**/*",
                 "input": "public"
-              }
+              },
+              "src/assets"
             ],
             "styles": ["src/styles.scss"],
             "scripts": []

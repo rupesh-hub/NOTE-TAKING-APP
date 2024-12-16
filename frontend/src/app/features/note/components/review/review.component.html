@@ -1,0 +1,190 @@
+<div class="container w-full border border-dashed mt-8 px-2 py-4 rounded-md">
+    <div class="w-full mx-auto">
+      <h2 class="text-lg font-semibold text-gray-800 mb-4">Comments & Reviews</h2>
+      
+      <!-- Add/Edit Comment Section -->
+      <div class="mb-6">
+        <textarea
+          class="w-full h-24 p-3 border border-gray-300 rounded-lg outline-none focus:shadow-md"
+          placeholder="{{ isEditMode ? 'Edit your comment...' : 'Write your comment...' }}"
+          [(ngModel)]="newComment">
+        </textarea>
+        <button 
+          class="border border-[#8B9F82]/30 flex justify-center items-center gap-2 text-sm rounded-md px-4 py-2 bg-[#8B9F82]/30 group"
+          (click)="postComment()">
+           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 group-hover:text-blue-500">
+             <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+           </svg>
+           <span class="font-medium font-serif group-hover:text-blue-500">
+             {{ isEditMode ? 'Update Comment' : 'Post Comment' }}
+           </span>
+        </button>   
+      </div>
+      
+      <!-- Comments List -->
+      <div class="space-y-6">
+        <div 
+          class="bg-white p-4 rounded-lg border border-gray-200" 
+          *ngFor="let comment of comments">
+          <div class="flex justify-start gap-4 items-center">
+            <div class="flex justify-between items-center w-full">
+              <div class="flex gap-2 justify-start items-center">
+                <img [src]="comment.author.profile" alt="" class="h-12 w-12 rounded-full">
+                <p class="font-semibold text-gray-800 font-serif">{{ comment.author.name }}</p>
+              </div>
+              <p class="text-sm text-gray-500 italic font-serif">Posted on: {{ comment.timestamp | date:'medium' }}</p>
+            </div>
+            <div class="space-x-2 flex" *ngIf="comment.owned">
+              <button 
+                class="text-gray-500 border rounded-md px-4 py-1 flex gap-2 justify-center items-center font-serif text-sm hover:bg-indigo-100 hover:border-indigo-300 group" 
+                (click)="editComment(comment)">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:text-blue-500">
+                  <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>
+                </svg>
+                <span class="group-hover:text-blue-500">Edit</span>
+              </button>
+              <button 
+                class="text-gray-500 bg-gray-50 border border-gray-300 rounded-md px-4 py-1 flex gap-2 justify-center items-center font-serif text-sm hover:bg-red-100 hover:border-red-300 group" 
+                (click)="deleteComment(comment)">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:text-red-500">
+                  <path d="M3 6h18"></path>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+                <span class="group-hover:text-red-500">Delete</span>
+              </button>
+            </div>
+          </div>
+          <p class="mt-3 text-gray-700 font-serif">{{ comment.text }}</p>
+  
+          <!-- Actions -->
+          <div class="mt-4 flex items-center space-x-4">
+            <!-- Reply Action -->
+            <div class="flex items-center space-x-1 text-gray-600 hover:text-blue-500 cursor-pointer border rounded-md px-4 py-1 group">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1 group-hover:text-blue-500">
+                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+              </svg>
+              <span class="group-hover:text-blue-500">Reply</span>
+            </div>
+            
+            <!-- Like Action -->
+            <div 
+              class="flex items-center space-x-1 cursor-pointer border rounded-md px-4 py-1 group"
+              [ngClass]="{
+                'text-green-600': comment.userLiked,
+                'text-gray-600 hover:text-green-500': !comment.userLiked
+              }"
+              (click)="handleCommentInteraction(comment, 'like')">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1 group-hover:text-green-500">
+                <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/>
+              </svg>
+              <span class="group-hover:text-green-500">{{ comment.likes }}</span>
+            </div>
+            
+            <!-- Dislike Action -->
+            <div 
+              class="flex items-center space-x-1 cursor-pointer border rounded-md px-4 py-1 group"
+              [ngClass]="{
+                'text-red-600': comment.userDisliked,
+                'text-gray-600 hover:text-red-500': !comment.userDisliked
+              }"
+              (click)="handleCommentInteraction(comment, 'dislike')">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1 group-hover:text-red-500">
+                <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/>
+              </svg>
+              <span class="group-hover:text-red-500">{{ comment.dislikes }}</span>
+            </div>
+            
+            <!-- Share Action -->
+            <div 
+              class="flex items-center space-x-1 text-gray-600 hover:text-indigo-500 cursor-pointer border rounded-md px-4 py-1 group" 
+              (click)="shareComment(comment)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1 group-hover:text-indigo-500">
+                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                <polyline points="16 6 12 2 8 6"></polyline>
+                <line x1="12" y1="2" x2="12" y2="15"></line>
+              </svg>
+              <span class="group-hover:text-indigo-500">Share</span>
+            </div>
+          </div>
+  
+          <!-- Reply Input -->
+          <div class="mt-4">
+            <textarea
+              class="w-full h-20 p-3 border border-gray-300 rounded-lg outline-none focus:shadow-md"
+              [placeholder]="editingReplyData ? 'Edit your reply...' : 'Write a reply...'"
+              [(ngModel)]="newReply[comment.id]">
+            </textarea>
+            <button 
+              class="mt-2 border border-[#8B9F82]/30 flex justify-center items-center gap-2 text-sm rounded-md px-4 py-2 bg-[#8B9F82]/30"
+              (click)="replyToComment(comment)">
+               <span class="font-medium font-serif">
+                 {{ editingReplyData ? 'Update Reply' : 'Post Reply' }}
+               </span>
+            </button>
+          </div>
+  
+          <!-- Reply Section -->
+          <div class="mt-4 pl-6" *ngIf="comment?.replies?.length > 0">
+            <div 
+                class="bg-gray-50 p-3 rounded-lg border border-gray-200 mb-2" 
+                *ngFor="let reply of comment.replies">
+                <div class="flex justify-between items-center">
+                <div>
+                  <p class="font-semibold text-gray-800">{{ reply.author }}</p>
+                  <p class="text-sm text-gray-500">Replied on {{ reply.timestamp | date:'medium' }}</p>
+                </div>
+                <div class="space-x-2 flex" *ngIf="reply.owned">
+                    <button 
+                      class="text-gray-500 border rounded-md px-4 py-1 flex gap-2 justify-center items-center font-serif text-sm hover:bg-indigo-100 hover:border-indigo-300 group" 
+                      (click)="editReply(reply, comment)">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:text-blue-500">
+                        <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>
+                      </svg>
+                      <span class="group-hover:text-blue-500">Edit</span>
+                    </button>
+                    <button 
+                      class="text-gray-500 bg-gray-50 border border-gray-300 rounded-md px-4 py-1 flex gap-2 justify-center items-center font-serif text-sm hover:bg-red-100 hover:border-red-300 group" 
+                      (click)="deleteReply(reply, comment)">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:text-red-500">
+                        <path d="M3 6h18"></path>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                      </svg>
+                      <span class="group-hover:text-red-500">Delete</span>
+                    </button>
+                  </div>
+              </div>
+              <p class="mt-3 text-gray-700">{{ reply.text }}</p>
+  
+              <!-- Reply Actions -->
+              <div class="mt-3 flex items-center space-x-4">
+                <div 
+                  class="flex items-center space-x-1 cursor-pointer border rounded-md px-4 py-1"
+                  [ngClass]="{
+                    'text-green-600': reply.userLiked,
+                    'text-gray-600 hover:text-green-500': !reply.userLiked
+                  }"
+                  (click)="handleReplyInteraction(reply, comment, 'like')">
+                  <svg xmlns="http://www.w3.org/2000/svg" height="16px" width="16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/>
+                  </svg>
+                  <span>{{ reply.likes }}</span>
+                </div>
+                <div 
+                  class="flex items-center space-x-1 cursor-pointer border rounded-md px-4 py-1"
+                  [ngClass]="{
+                    'text-red-600': reply.userDisliked,
+                    'text-gray-600 hover:text-red-500': !reply.userDisliked
+                  }"
+                  (click)="handleReplyInteraction(reply, comment, 'dislike')">
+                  <svg xmlns="http://www.w3.org/2000/svg" height="16px" width="16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/>
+                  </svg>
+                  <span>{{ reply.dislikes }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

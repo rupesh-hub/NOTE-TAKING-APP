@@ -1,0 +1,150 @@
+
+    <div class="container mx-auto p-6 max-w-4xl ">
+      <!-- User Information Section -->
+      <div class="bg-white rounded-md p-6 mb-6 border-l-4 border-[#8B9F82] flex justify-between items-start">
+        <div class="flex items-center mb-4">
+          <!-- Profile Image Upload -->
+          <div class="relative mr-6">
+            <img 
+              [src]="userProfile?.profile" 
+              alt="Profile" 
+              class="w-24 h-24 rounded-full object-cover"
+            >
+            <input 
+              type="file" 
+              #fileInput
+              (change)="onFileSelected($event)"
+              accept="image/*" 
+              class="hidden"
+            >
+            <button class="absolute bottom-0 right-0  text-white w-8 h-8  border bg-[#8B9F82] border-[#8B9F82]/30 flex justify-center items-center gap-2 text-sm rounded-full px-4 py-2"
+            (click)="fileInput.click()" >
+              <fa-icon [icon]="faImage"></fa-icon>
+           </button>
+
+          </div>
+
+          <!-- User Information Edit -->
+          <div class="flex-grow">
+
+            <div *ngIf="!isEditing" class="space-y-1">
+              <h2 class="text-2xl font-bold text-gray-800">
+                {{ userProfile?.name}}
+              </h2>
+              <p class="text-gray-600 italic">{{ userProfile?.email }}</p>
+              
+              <button class="border border-[#8B9F82]/30 flex justify-center items-center gap-2 text-sm rounded-md px-4 py-2 bg-[#8B9F82]/10"
+              (click)="startEditing()">
+                <fa-icon [icon]="faEdit"></fa-icon>
+                <span>Edit Profile</span>
+             </button>
+
+            </div>
+
+            <div *ngIf="isEditing" class="space-y-4">
+              <div class="flex space-x-4">
+                <input 
+                  [(ngModel)]="editedProfile.firstName"
+                  placeholder="First Name"
+                  class="w-1/2 px-3 py-2 border rounded-md"
+                >
+                <input 
+                  [(ngModel)]="editedProfile.lastName"
+                  placeholder="Last Name"
+                  class="w-1/2 px-3 py-2 border rounded-md"
+                >
+              </div>
+              <input 
+                [(ngModel)]="editedProfile.email"
+                placeholder="Email"
+                class="italic w-full px-3 py-2 border rounded-md cursor-not-allowed read-only:bg-gray-100 read-only:text-gray-400 read-only:opacity-70"
+                [readonly]="true" 
+            >
+
+              <div class="flex space-x-2">
+                <button 
+                  (click)="saveProfile()"
+                  class="text-[#8B9F82] hover:text-[#8B9F82]/90 transition text-xs border border-[#8B9F82]/30 px-4 py-1 rounded-md uppercase"
+                >
+                  Save
+                </button>
+                <button 
+                  (click)="cancelEditing()"
+                  class="text-red-500 hover:text-red-600 transition text-xs border border-red-300 bg-red-100 px-2 py-1 rounded-md uppercase"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button 
+        class="border border-[#8B9F82]/30 flex justify-center items-center gap-2 text-sm rounded-md px-4 py-2 bg-[#8B9F82]/10"
+        [ngClass]="{'opacity-50 cursor-not-allowed': isChangePasswordRequested}"
+        [disabled]="isChangePasswordRequested"
+        (click)="changePasswordRequest()">
+          <fa-icon *ngIf="!isChangePasswordRequested" [icon]="faEdit"></fa-icon>
+          <span *ngIf="!isChangePasswordRequested">Change password</span>
+          <span *ngIf="isChangePasswordRequested">Requesting...</span>
+      </button>
+      
+      </div>
+
+      <!-- Projects Sections Remain the Same as Previous Implementation -->
+      <div class="mb-6 border-l-4 bg-white rounded-md px-4 py-2 border-[#8B9F82]">
+        <h3 class="text-xl font-semibold mb-4 text-gray-500 font-serif flex gap-2">
+            <fa-icon [icon]="faFolder"></fa-icon>
+            My Own Projects
+        </h3>
+        <div 
+          *ngIf="ownProjects.length; else noOwnProjects" 
+          class="grid md:grid-cols-2 gap-4"
+        >
+          <div 
+            *ngFor="let project of ownProjects" 
+            class="bg-[#8B9F82]/15 p-2 rounded-md"
+          >
+            <h4 class=" text-lg mb-2 flex justify-between items-center">
+                <span class="font-semibold font-serif">{{ project.title }}</span>
+                <p class="text-xs text-gray-500 font-serif font-semibold">
+                    Created: {{ project.createdAt | date:'mediumDate' }}
+                </p>   
+            </h4>
+            <p class="mb-2 font-serif border bg-white px-2 py-4 rounded-md text-gray-500 italic">{{ project.description }}</p>
+            
+          </div>
+        </div>
+        <ng-template #noOwnProjects>
+          <p class="text-gray-500">No projects created yet.</p>
+        </ng-template>
+      </div>
+
+      <!-- Assigned Projects Section (Same as Before) -->
+      <div class="mb-6 border-l-4 bg-white rounded-md px-4 py-2 border-[#8B9F82]">
+        <h3 class="text-xl font-semibold mb-4 text-gray-500 font-serif flex gap-2">
+            <fa-icon [icon]="faFolder"></fa-icon>
+            My Assigned Projects
+        </h3>
+        <div 
+          *ngIf="assignedProjects.length; else noAssignedProjects" 
+          class="grid md:grid-cols-2 gap-4"
+        >
+          <div 
+            *ngFor="let project of assignedProjects" 
+            class="bg-[#8B9F82]/15 p-2 rounded-md"
+          >
+          <h4 class=" text-lg mb-2 flex justify-between items-center">
+            <span class="font-semibold font-serif">{{ project.title }}</span>
+            <p class="text-xs text-gray-500 font-serif font-semibold">
+                Created: {{ project.createdAt | date:'mediumDate' }}
+            </p>   
+        </h4>
+        <p class="mb-2 font-serif border bg-white px-2 py-4 rounded-md text-gray-500 italic">{{ project.description }}</p>
+          </div>
+        </div>
+        <ng-template #noAssignedProjects>
+          <p class="text-gray-500">No projects assigned.</p>
+        </ng-template>
+      </div>
+    </div>

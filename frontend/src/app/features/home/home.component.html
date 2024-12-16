@@ -1,0 +1,187 @@
+<!-- project-dashboard.component.html -->
+<section class="max-w-7xl mx-auto p-4">
+    <div class="grid grid-cols-7 gap-4">
+      <!-- Projects Section -->
+      <div class="col-span-5 flex flex-col gap-4">
+        <div class="header font-medium flex items-center gap-2 text-gray-500">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+          </svg>
+          <span>My Projects</span>
+        </div>
+  
+        <!-- Projects Grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4 project-scrollbar">
+          
+          <ng-container *ngFor="let project of projects">
+            <div  class="flex items-center justify-center cursor-pointer" [routerLink]='["/home/projects",project._id]'>
+              <div class="relative w-56 h-32">
+                <div class="absolute top-0 left-0 w-24 h-6 bg-white rounded-t-md shadow-sm border-l-2 border-[#8B9F82]"></div>
+    
+                <div class="absolute top-3 left-0 w-full h-[calc(100%-12px)] bg-white rounded-b-md rounded-tr-md flex flex-col justify-between p-[12px] shadow-sm border-l-2 border-[#8B9F82]">
+                  <div class="top flex justify-start gap-x-2 items-center">
+                    <svg fill="#000000" width="25px" height="64px" viewBox="0 0 24 24" id="done-collection" data-name="Flat Color" xmlns="http://www.w3.org/2000/svg" class="icon flat-color"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path id="primary" d="M18,4V16a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V4A2,2,0,0,1,4,2H16A2,2,0,0,1,18,4Zm4,16V5a1,1,0,0,0-2,0V20H7a1,1,0,0,0,0,2H20A2,2,0,0,0,22,20Z" style="fill: #000000;"></path><path id="secondary" d="M9.25,12.88a1,1,0,0,1-.71-.3L6.29,10.33a1,1,0,0,1,0-1.41,1,1,0,0,1,1.42,0l1.54,1.54,3-3a1,1,0,0,1,1.42,0,1,1,0,0,1,0,1.41L10,12.58A1,1,0,0,1,9.25,12.88Z" style="fill: #fff;"></path></g></svg>
+                    <div
+                      class="text-sm text-gray-600 font-semibold truncate"
+                      style="max-width: 200px;"
+                    >
+                      {{ project.title | slice:0:100 }}
+                    </div>
+                  </div>
+                  
+    
+                  <div class="bottom flex justify-between items-center">
+                    <div class="text-[12px] text-gray-400">
+                      {{ project.createdAt | date:'medium' }}
+                    </div>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="1"></circle>
+                      <circle cx="12" cy="5" r="1"></circle>
+                      <circle cx="12" cy="19" r="1"></circle>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          
+        </div>
+      </div>
+  
+      <!-- Tasks Section -->
+      <div class="col-span-2 flex flex-col gap-4 h-80">
+        <div class="header font-medium flex items-center gap-2 text-gray-500">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+          <span>My Tasks</span> 
+        </div>
+  
+        <!-- Tasks List -->
+        <div class="task-scrollbar bg-gray-50 rounded-lg px-2 py-4">
+          <div *ngFor="let task of tasks" class="task-item">
+            <div class="body flex justify-between items-center p-[16px] bg-[#8B9F82]/10 mb-2 rounded-lg border-l-2 border-[#8B9F82]">
+              <div class="left flex justify-start items-center gap-x-4 ">
+                <input 
+                  type="checkbox" 
+                  [checked]="task.completed"
+                  (change)="toggleTaskCompletion(task)"
+                  class="form-checkbox text-[#8B9F82] rounded"
+                />
+                <div class="content flex flex-col justify-start items-start">
+                  <p class="text-sm" [class.line-through]="task.completed">{{ task.title }}</p>
+                  <small class="text-gray-400 text-[11px] font-semibold">{{ task.timeLeft }}</small>
+                </div>
+              </div>
+  
+              <div class="right">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400 hover:text-[#8B9F82]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Notes and Activity Section -->
+    <div class="grid grid-cols-7 gap-4 mt-8 w-full">
+      <!-- Notes Section -->
+      <div class="col-span-5 flex flex-col gap-4">
+        <div class="header font-medium flex items-center gap-2 text-gray-500">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+          </svg>
+          <span>My Notes</span>
+        </div>
+  
+        <!-- Notes Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 gap-4 notes-scrollbar">
+          <div *ngFor="let note of notes" class="flex items-center justify-center" [routerLink]="['/home/notes',note._id]">
+            <div class="w-full bg-white rounded-md flex flex-col justify-between p-[16px] shadow-sm border-l-2 border-[#8B9F82] h-40 overflow-auto">
+              <div class="top flex flex-col">
+                <div class="header w-full flex justify-between gap-x-2 items-center h-[40px] mb-2">
+                  <div class="text-[12px] text-gray-400 text-semibold">
+                    {{ note.createdAt| date:'medium' }}
+                  </div>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="1"></circle>
+                    <circle cx="12" cy="5" r="1"></circle>
+                    <circle cx="12" cy="19" r="1"></circle>
+                  </svg>
+                </div>
+  
+                <div class="content flex flex-col gap-2">
+                  <div class="title text-sm font-semibold text-gray-500">
+                    {{ note.title }}
+                  </div>
+                  <div class="desc text-[13px] text-justify text-gray-400" [innerHTML]="note.content | slice:0:400">
+                    <!-- {{ note.content }} -->
+                  </div>
+                </div>
+              </div>
+  
+              <div class="bottom flex justify-start items-center gap-4 mt-4 text-nowrap overflow-x-auto">
+                <span *ngFor="let tag of note.tags" class="px-3 py-1 rounded-full text-[12px] mr-2 text-gray-500">
+                  {{ tag }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Recent Activity Section -->
+      <div class="col-span-2 flex flex-col gap-4">
+        <div class="header font-medium flex items-center gap-2 text-gray-500">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="8.5" cy="7" r="4"></circle>
+            <polyline points="17 11 19 13 23 9"></polyline>
+          </svg>
+          <span>Recent Activity</span>
+        </div>
+  
+        <div class="bg-white shadow-sm rounded-lg max-w-md mx-auto font-serif h-80 overflow-auto">
+          <div class="divide-y divide-gray-100">
+            <div *ngFor="let activity of activities" class="px-4 py-3 hover:bg-gray-50 transition-colors duration-200 cursor-pointer group">
+              <div class="flex items-start space-x-3">
+                <!-- Profile Picture -->
+                <div class="flex-shrink-0">
+                  <img 
+                    [src]="activity?.profile" 
+                    alt="{{ activity.name }}" 
+                    class="h-10 w-10 rounded-full object-cover border-2 border-opacity-10 border-gray-300 group-hover:border-[#8B9F82]/30"
+                  />
+                </div>
+                
+                <!-- Notification Content -->
+                <div class="flex-1 min-w-0">
+                  <div class="text-sm ">
+                    <span class="font-semibold text-gray-800">{{ activity.name }}</span>
+                    <span class="text-gray-500 ml-1 font-serif" [innerHTML]="activity.message"></span>
+                  </div>
+                  
+                  <!-- Timestamp -->
+                  <div class="text-xs text-gray-500 mt-1 italic">
+                    {{ activity.date | date:'shortTime' }}
+                  </div>
+                </div>
+                
+              </div>
+            </div>
+          </div>
+          
+          <!-- View All Button -->
+          <div class="px-4 py-3 text-center bg-gray-50 rounded-b-lg">
+            <a href="#" class="text-[#8B9F82] font-semibold text-sm hover:bg-blue-50 px-3 py-1 rounded-md transition-colors font-serif">
+              View All Activities
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>

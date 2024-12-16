@@ -1,0 +1,408 @@
+<!-- project-detail.component.html -->
+<div *ngIf="project" class="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl mx-auto space-y-8">
+      <!-- Project Header -->
+      <div class="bg-white shadow-sm rounded-lg p-6 border-l-4 border-[#8B9F82]">
+        <div class="flex flex-col gap-4">
+          <!-- View Mode -->
+          <ng-container *ngIf="!isEditing">
+            <div class="flex justify-between items-center">
+              <h1 class="text-xl font-extrabold text-gray-900 tracking-tight">
+                {{ project.title }}
+              </h1>
+              <span class="text-sm text-gray-500 italic font-medium">
+                Created at: {{ project.createdAt | date }}
+              </span>
+            </div>
+            <div class="flex flex-col justify-start items-start gap-2 border border-[#8B9F82]/40 px-2 py-4 rounded-lg">
+              <p class="text-md text-gray-500 italic font-medium">
+                {{ project.description }}
+              </p>
+            </div>
+            <div class="flex justify-end gap-2">
+              
+              <button class="border border-[#8B9F82]/30 flex justify-center items-center gap-2 text-sm rounded-md px-4 py-2 bg-[#8B9F82]/10"
+              [routerLink]='["/home/notes/edit", project._id]'
+              >
+              <svg fill="#000000" width="18px" height="18px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M13.5,20 C14.3284271,20 15,19.3284271 15,18.5 C15,17.1192881 16.1192881,16 17.5,16 C18.3284271,16 19,15.3284271 19,14.5 L19,11.5 C19,11.2238576 19.2238576,11 19.5,11 C19.7761424,11 20,11.2238576 20,11.5 L20,14.5 C20,18.0898509 17.0898509,21 13.5,21 L6.5,21 C5.11928813,21 4,19.8807119 4,18.5 L4,5.5 C4,4.11928813 5.11928813,3 6.5,3 L12.5,3 C12.7761424,3 13,3.22385763 13,3.5 C13,3.77614237 12.7761424,4 12.5,4 L6.5,4 C5.67157288,4 5,4.67157288 5,5.5 L5,18.5 C5,19.3284271 5.67157288,20 6.5,20 L13.5,20 L13.5,20 Z M15.7913481,19.5014408 C16.9873685,18.9526013 17.9526013,17.9873685 18.5014408,16.7913481 C18.1948298,16.9255432 17.8561101,17 17.5,17 C16.6715729,17 16,17.6715729 16,18.5 C16,18.8561101 15.9255432,19.1948298 15.7913481,19.5014408 L15.7913481,19.5014408 Z M18,6 L20.5,6 C20.7761424,6 21,6.22385763 21,6.5 C21,6.77614237 20.7761424,7 20.5,7 L18,7 L18,9.5 C18,9.77614237 17.7761424,10 17.5,10 C17.2238576,10 17,9.77614237 17,9.5 L17,7 L14.5,7 C14.2238576,7 14,6.77614237 14,6.5 C14,6.22385763 14.2238576,6 14.5,6 L17,6 L17,3.5 C17,3.22385763 17.2238576,3 17.5,3 C17.7761424,3 18,3.22385763 18,3.5 L18,6 Z M8.5,9 C8.22385763,9 8,8.77614237 8,8.5 C8,8.22385763 8.22385763,8 8.5,8 L12.5,8 C12.7761424,8 13,8.22385763 13,8.5 C13,8.77614237 12.7761424,9 12.5,9 L8.5,9 Z M8.5,12 C8.22385763,12 8,11.7761424 8,11.5 C8,11.2238576 8.22385763,11 8.5,11 L15.5,11 C15.7761424,11 16,11.2238576 16,11.5 C16,11.7761424 15.7761424,12 15.5,12 L8.5,12 Z M8.5,15 C8.22385763,15 8,14.7761424 8,14.5 C8,14.2238576 8.22385763,14 8.5,14 L13.5,14 C13.7761424,14 14,14.2238576 14,14.5 C14,14.7761424 13.7761424,15 13.5,15 L8.5,15 Z"></path> </g></svg>
+                <span>New Note</span>
+             </button>
+
+             <button class="border border-[#8B9F82]/30 flex justify-center items-center gap-2 text-sm rounded-md px-4 py-2 bg-[#8B9F82]/10"
+              (click)="startEditing()">
+                <fa-icon [icon]="faEdit"></fa-icon>
+                <span>Edit Project</span>
+             </button>
+
+             <button class="border border-red-200 flex justify-center items-center gap-2 text-sm rounded-md px-4 py-2 bg-red-100 text-red-600"
+             (click)="openRemoveProjectModal()">
+               <fa-icon [icon]="faTrashCan"></fa-icon>
+               <span>Delete Project</span>
+            </button>
+
+            </div>
+          </ng-container>
+  
+          <!-- Edit Mode -->
+          <ng-container *ngIf="isEditing">
+            <div class="flex flex-col gap-4">
+              <input 
+                [(ngModel)]="editedProject.title"
+                placeholder="Project Title"
+                class="w-full px-3 py-2 border rounded-md text-xl font-extrabold outline-none"
+              >
+              <textarea 
+                [(ngModel)]="editedProject.description"
+                placeholder="Project Description"
+                rows="4"
+                class="w-full px-3 py-2 border rounded-md text-md outline-none"
+              ></textarea>
+              <div class="flex justify-end space-x-2">
+                
+                <button 
+                  (click)="saveProject()"
+                  class="text-[#8B9F82] hover:text-[#8B9F82] transition text-xs border border-[#8B9F82]/30 bg-gray-50 px-4 py-1 rounded-md uppercase"
+                >
+                <fa-icon [icon]="faSave" class="mr-1"></fa-icon>
+                  Save
+                </button>
+
+                <button 
+                  (click)="cancelEditing()"
+                  class="text-red-500 hover:text-red-600 transition text-xs border border-red-300 bg-red-100 px-2 py-1 rounded-md uppercase"
+                >
+                <fa-icon [icon]="faCancel"  class="mr-1"></fa-icon>
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+
+      <div class="space-y-6 bg-white px-6 py-4 rounded-lg border-l-4 border-[#8B9F82]">
+        <h2 class="text-xl font-bold flex gap-3 text-gray-500">
+          <fa-icon [icon]="faUsers"></fa-icon>
+          <span>Collaborators</span>
+        </h2>
+      
+        <!-- Collaborators Grid -->
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4 justify-center items-center">
+          <div *ngFor="let collaborator of project.collaborators" 
+               class="relative group bg-[#8B9F82]/10 rounded-lg p-4 hover:shadow-md transition-all duration-300 border-b-2 border-[#8B9F82]">
+
+               <button 
+               (click)="openRemoveCollaboratorModal(collaborator.user)"
+               class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+               <fa-icon [icon]="faTimesCircle" class="text-red-500 hover:text-red-700 text-xl"></fa-icon>
+             </button>
+
+               <div class="flex gap-4">
+                <div class="flex items-center gap-4">
+                  <!-- Profile Image -->
+                 <img [src]="collaborator.user.profile" alt="Profile" class="w-16 h-16 rounded-full object-cover border-4 border-[#8B9F82]/60" />
+             </div>
+
+             <div class="flex flex-col gap-1">
+               <!-- Collaborator Name -->
+               <h3 class="text-lg font-semibold text-gray-900 font-serif">{{ collaborator.user.name }}</h3>
+
+               <!-- Authorities List -->
+               <div class="text-gray-600 text-sm mt-1 flex gap-1">
+                 <span class="mr-2 text-xs border border-[#8B9F82]/30 text-[#8B9F82] p-2 rounded-md bg-white" *ngFor="let auth of collaborator.authorities">
+                   {{ auth.name }}
+                 </span>
+               </div>
+             </div>
+               </div>
+
+              <!-- Permissions Section -->
+            <div class="space-y-2 text-sm text-gray-700 mt-3">
+              <h4 class="font-semibold text-gray-800">Permissions</h4>
+
+              
+              <div  class="flex items-center overflow-auto">
+                <ng-container *ngFor="let auth of collaborator.authorities">
+                  <span class="text-xs border border-[#8B9F82]/30 text-[#8B9F82] p-2 rounded-md bg-white mr-[2px]" *ngFor="let permission of auth.permissions">
+                    {{permission}}
+                  </span>
+                </ng-container>
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <!-- Invite Collaborators Button -->
+        <button 
+          (click)="toggleInviteSection()" 
+          class="w-[24%] rounded-md px-4 py-2 text-sm flex gap-2 border bg-[#8B9F82]/10 hover:bg-[#8B9F82]/20 transition-colors">
+          <fa-icon [icon]="faUserPlus" class="font-semibold text-[#8B9F82]"></fa-icon>
+          <span class="font-semibold text-[#8B9F82]">Invite Collaborator</span>
+        </button>
+      
+        <!-- Invite Section -->
+        <div *ngIf="showInviteSection" class="mt-4 bg-gray-50 p-4 rounded-lg">
+          <div class="flex items-center space-x-4">
+            <input 
+              [(ngModel)]="searchEmail" 
+              placeholder="Enter user email" 
+              class="flex-grow p-2 border rounded-md outline-none text-gray-500 italic"
+            />
+            <button 
+            (click)="searchUserByEmail()" 
+              class="text-sm bg-[#8B9F82]/10 border border-[#8B9F82]/30 text-gray-500 px-4 py-2 rounded-md flex items-center gap-2 hover:bg-[#8B9F82]/20 transition-colors"
+            >
+              <fa-icon [icon]="faSearch" class="text-[#8B9F82]"></fa-icon>
+              <span>Search</span>
+            </button>
+          </div>
+      
+          <!-- Found User Details -->
+          <div *ngIf="foundUser" class="mt-4 flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+              <img 
+                [src]="foundUser.profile" 
+                class="w-12 h-12 rounded-full"
+              />
+              <div class="text-gray-500">
+                <h3>{{ foundUser.name }}</h3>
+                <p>{{ foundUser.email }}</p>
+              </div>
+            </div>
+      
+            <!-- Authority Selection -->
+            <div class="mt-4 border rounded-md p-2">
+              <label class="block mb-2 text-sm text-gray-500">Select Authorities:</label>
+              <div class="flex space-x-4">
+                <label class="flex items-center">
+                  <input 
+                    type="checkbox" 
+                    [(ngModel)]="authorities.viewer"
+                    class="mr-2"
+                  />
+                  <span class="text-gray-500 uppercase text-sm">Viewer</span>
+                </label>
+                <label class="flex items-center">
+                  <input 
+                    type="checkbox" 
+                    [(ngModel)]="authorities.editor"
+                    class="mr-2"
+                  />
+                  <span class="text-gray-500 uppercase text-sm">Editor</span>
+                </label>
+              </div>
+            </div>
+      
+            <!-- Invite Button -->
+            <button 
+              (click)="inviteCollaborator()" 
+              class="text-sm mt-4 bg-[#8B9F82]/10 border border-[#8B9F82]/30 text-gray-500 px-4 py-2 rounded-md flex items-center gap-2 hover:bg-[#8B9F82]/20 transition-colors"
+            >
+              <fa-icon [icon]="faUserPlus" class="text-[#8B9F82]"></fa-icon>
+              <span>Send invitation</span>
+            </button>
+
+          </div>
+        </div>
+      </div>
+  
+      <!-- Notes Section -->
+    <div class="space-y-6 bg-white px-6 py-4 rounded-lg border-l-4 border-[#8B9F82]">
+      
+      <div class="flex justify-between items-center">
+        <h2 class="text-lg font-bold text-gray-500 flex gap-2">
+          <fa-icon [icon]="faNoteSticky"></fa-icon>
+          <span>Notes</span>
+        </h2>
+      
+        <!-- Add Note Button -->
+          <button
+            class="px-4 py-2 text-sm border bg-[#8B9F82]/10 text-[#8B9F82] font-semibold rounded-lg"
+            [routerLink]='["/home/notes/edit", project._id]'
+            >
+          <fa-icon [icon]="faAdd"></fa-icon>
+          Add note
+          </button>
+      </div>
+
+      <!-- Notes Table -->
+      <div class="bg-white rounded-lg overflow-hidden">
+        <table class="w-full text-left table-auto">
+          <thead class="bg-[#8B9F82]/20">
+            <tr >
+              <th class="p-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Title</th>
+              <th class="p-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Content</th>
+              <th class="p-3 text-xs font-semibold text-gray-500 uppercase tracking-wider flex gap-2">
+                <svg width="16px" height="16px" viewBox="0 0 28 28" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns" fill="#000000" transform="matrix(1, 0, 0, 1, 0, 0)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#CCCCCC" stroke-width="0.392"></g><g id="SVGRepo_iconCarrier"> <title>attachment-2</title> <desc>Created with Sketch Beta.</desc> <defs> </defs> <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage"> <g id="Icon-Set" sketch:type="MSLayerGroup" transform="translate(-258.000000, -154.000000)" fill="#000000"> <path d="M284.562,164.181 L270.325,178.26 C267.966,180.593 264.141,180.593 261.782,178.26 C259.423,175.928 259.423,172.146 261.782,169.813 L274.596,157.141 C276.168,155.586 278.718,155.586 280.291,157.141 C281.863,158.696 281.863,161.218 280.291,162.772 L267.477,175.444 C266.691,176.222 265.416,176.222 264.629,175.444 C263.843,174.667 263.843,173.406 264.629,172.628 L276.02,161.365 L274.596,159.957 L263.206,171.221 C261.633,172.775 261.633,175.297 263.206,176.853 C264.778,178.407 267.328,178.407 268.901,176.852 L281.714,164.181 C284.073,161.849 284.074,158.065 281.715,155.733 C279.355,153.4 275.531,153.4 273.172,155.733 L259.646,169.108 L259.696,169.157 C257.238,172.281 257.455,176.797 260.358,179.668 C263.262,182.539 267.828,182.754 270.987,180.323 L271.036,180.372 L285.986,165.589 L284.562,164.181" id="attachment-2" sketch:type="MSShapeGroup"> </path> </g> </g> </g></svg>
+                Attachments
+              </th>
+              <th class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200">
+            <tr *ngFor="let note of project.notes" class="bg-[#8B9F82]/10">
+              <td class="text-sm font-medium text-gray-800 p-3">{{ note.title }}</td>
+              <td class="text-sm text-gray-600 truncate max-w-xs py-2 p-3" [innerHTML]="note.content | slice:0:200"></td>
+              <td class="py-3 overflow-x-auto w-[30%]">
+                <!-- Scrollable image container -->
+                <div *ngIf="note?.images?.length > 0" class="flex gap-2 overflow-x-auto whitespace-nowrap">
+                  <img
+                    *ngFor="let image of note?.images"
+                    [src]="image"
+                    alt="Note Image"
+                    class="w-12 h-12 rounded-md"
+                  />
+                </div>
+                <span *ngIf="note?.images?.length === 0" class="text-gray-400 text-xs">No attachments</span>
+              </td>
+              <!-- Center icons -->
+              <td class="text-sm font-medium text-gray-500 py-2 p-3">
+                <fa-icon [icon]="faEye" class="cursor-pointer hover:text-blue-500" [routerLink]='["/home/notes", note?._id]'></fa-icon>
+                <fa-icon [icon]="faTrashCan" class="cursor-pointer ml-2 hover:text-red-500" (click)="openRemoveNoteModal(note)"></fa-icon>
+              </td>
+            </tr>
+          </tbody>
+          
+        </table>
+      </div>
+    </div>
+
+  
+    <!-- Draft Section -->
+    <div class="space-y-6 bg-white px-6 py-4 rounded-lg border-l-4 border-[#8B9F82]">
+      
+      <div class="flex justify-between items-center">
+        <h2 class="text-lg font-bold text-gray-500 flex gap-2">
+          <fa-icon [icon]="faNoteSticky"></fa-icon>
+          <span>Drafts</span>
+        </h2>
+      
+        <!-- Add Note Button -->
+          <button
+            class="px-4 py-2 text-sm border bg-[#8B9F82]/10 text-[#8B9F82] font-semibold rounded-lg"
+            >
+          <fa-icon [icon]="faAdd"></fa-icon>
+          Add draft
+          </button>
+      </div>
+
+      <!-- Draft Table -->
+      <div class="bg-white rounded-lg overflow-hidden">
+        <table class="w-full text-left table-auto">
+          <thead class="bg-[#8B9F82]/20">
+            <tr >
+              <th class="p-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Title</th>
+              <th class="p-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Content</th>
+              <th class="p-3 text-xs font-semibold text-gray-500 uppercase tracking-wider flex gap-2">
+                <svg width="16px" height="16px" viewBox="0 0 28 28" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns" fill="#000000" transform="matrix(1, 0, 0, 1, 0, 0)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#CCCCCC" stroke-width="0.392"></g><g id="SVGRepo_iconCarrier"> <title>attachment-2</title> <desc>Created with Sketch Beta.</desc> <defs> </defs> <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage"> <g id="Icon-Set" sketch:type="MSLayerGroup" transform="translate(-258.000000, -154.000000)" fill="#000000"> <path d="M284.562,164.181 L270.325,178.26 C267.966,180.593 264.141,180.593 261.782,178.26 C259.423,175.928 259.423,172.146 261.782,169.813 L274.596,157.141 C276.168,155.586 278.718,155.586 280.291,157.141 C281.863,158.696 281.863,161.218 280.291,162.772 L267.477,175.444 C266.691,176.222 265.416,176.222 264.629,175.444 C263.843,174.667 263.843,173.406 264.629,172.628 L276.02,161.365 L274.596,159.957 L263.206,171.221 C261.633,172.775 261.633,175.297 263.206,176.853 C264.778,178.407 267.328,178.407 268.901,176.852 L281.714,164.181 C284.073,161.849 284.074,158.065 281.715,155.733 C279.355,153.4 275.531,153.4 273.172,155.733 L259.646,169.108 L259.696,169.157 C257.238,172.281 257.455,176.797 260.358,179.668 C263.262,182.539 267.828,182.754 270.987,180.323 L271.036,180.372 L285.986,165.589 L284.562,164.181" id="attachment-2" sketch:type="MSShapeGroup"> </path> </g> </g> </g></svg>
+                Attachments
+              </th>
+              <th class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200">
+            <tr *ngFor="let note of project.notes" class="bg-[#8B9F82]/10">
+              <td class="text-sm font-medium text-gray-800 p-3">{{ note.title }}</td>
+              <td class="text-sm text-gray-600 truncate max-w-xs py-2 p-3" [innerHTML]="note.content | slice:0:200"></td>
+              <td class="py-3 overflow-x-auto w-[30%]">
+                <!-- Scrollable image container -->
+                <div *ngIf="note.images.length > 0" class="flex gap-2 overflow-x-auto whitespace-nowrap">
+                  <img
+                    *ngFor="let image of note.images"
+                    [src]="image"
+                    alt="Note Image"
+                    class="w-12 h-12 rounded-md"
+                  />
+                </div>
+                <span *ngIf="note.images.length === 0" class="text-gray-400 text-xs">No attachments</span>
+              </td>
+              <!-- Center icons -->
+              <td class="text-sm font-medium text-gray-500 py-2 p-3">
+                <fa-icon [icon]="faEye" class="cursor-pointer hover:text-blue-500"></fa-icon>
+                <fa-icon [icon]="faTrashCan" class="cursor-pointer ml-2 hover:text-red-500"></fa-icon>
+              </td>
+            </tr>
+          </tbody>
+          
+        </table>
+      </div>
+    </div>
+     
+    </div>
+  </div>
+
+
+  <!-- Remove Collaborator Modal -->
+<div *ngIf="showRemoveModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-red-50 p-6 rounded-lg shadow-xl border-2 border-red-200">
+    <h3 class="text-lg font-semibold mb-4">Remove Collaborator</h3>
+    <p class="mb-4">Are you sure you want to remove {{ selectedCollaborator?.name }}?</p>
+    <div class="flex justify-end space-x-4">
+
+      <button 
+      (click)="closeRemoveModal()"
+          class="rounded-md text-sm gap-2 border bg-red-50 hover:bg-red-100 transition-colors text-red-500 flex justify-center items-center px-4">
+          <fa-icon [icon]="faTimesCircle" class="font-semibold "></fa-icon>
+          <span class="font-semibold">Cancel</span>
+        </button>
+
+      <button 
+      (click)="removeCollaborator()"
+          class="rounded-md px-4 py-2 text-sm flex justify-center items-center gap-1 border bg-[#8B9F82]/10 hover:bg-[#8B9F82]/20 transition-colors">
+          <svg width="20px" height="20px" viewBox="0 -0.5 25 25" fill="none" class="font-semibold text-[#8B9F82]" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M5.5 12.5L10.167 17L19.5 8" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+          <span class="font-semibold text-[#8B9F82]">Remove</span>
+        </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Remove Project Modal -->
+<div *ngIf="showProjectRemoveModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 font-serif">
+  <div class="bg-red-50 p-6 rounded-lg shadow-xl border-2 border-red-200">
+    <h3 class="text-lg font-semibold mb-4">Remove Project!</h3>
+    <p class="mb-4">Are you sure you want to remove the project <strong class="italic font-serif">"{{ project?.title }}"</strong>?</p>
+    <div class="flex justify-end space-x-4">
+      <button 
+        (click)="closeProjectRemoveModal()"
+        class="rounded-md text-sm gap-2 border bg-red-50 hover:bg-red-100 transition-colors text-red-500 flex justify-center items-center px-4">
+        <fa-icon [icon]="faTimesCircle" class="font-semibold "></fa-icon>
+        <span class="font-semibold">Cancel</span>
+      </button>
+
+      <button 
+        (click)="deleteProject(project._id)"
+        class="rounded-md px-4 py-2 text-sm flex justify-center items-center gap-1 border bg-[#8B9F82]/10 hover:bg-[#8B9F82]/20 transition-colors">
+        <svg width="20px" height="20px" viewBox="0 -0.5 25 25" fill="none" class="font-semibold text-[#8B9F82]" xmlns="http://www.w3.org/2000/svg">
+          <path d="M5.5 12.5L10.167 17L19.5 8" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+        <span class="font-semibold text-[#8B9F82]">Remove</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Remove Note Modal -->
+<div *ngIf="showNoteRemoveModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-red-50 p-6 rounded-lg shadow-xl border-2 border-red-200">
+    <h3 class="text-lg font-semibold mb-4">Remove Note</h3>
+    <p class="mb-4">Are you sure you want to remove the note "{{ selectedNote?.title }}"?</p>
+    <div class="flex justify-end space-x-4">
+      <button 
+        (click)="closeNoteRemoveModal()"
+        class="rounded-md text-sm gap-2 border bg-red-50 hover:bg-red-100 transition-colors text-red-500 flex justify-center items-center px-4">
+        <fa-icon [icon]="faTimesCircle" class="font-semibold "></fa-icon>
+        <span class="font-semibold">Cancel</span>
+      </button>
+
+      <button 
+        (click)="removeNote()"
+        class="rounded-md px-4 py-2 text-sm flex justify-center items-center gap-1 border bg-[#8B9F82]/10 hover:bg-[#8B9F82]/20 transition-colors">
+        <svg width="20px" height="20px" viewBox="0 -0.5 25 25" fill="none" class="font-semibold text-[#8B9F82]" xmlns="http://www.w3.org/2000/svg">
+          <path d="M5.5 12.5L10.167 17L19.5 8" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+        <span class="font-semibold text-[#8B9F82]">Remove</span>
+      </button>
+    </div>
+  </div>
+</div>

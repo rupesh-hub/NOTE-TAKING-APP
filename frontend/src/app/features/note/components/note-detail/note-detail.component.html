@@ -1,0 +1,153 @@
+<div class="container px-4 py-4">
+
+    <!-- project details -->
+    <div class="mb-4 border border-dashed border-[#8B9F82]/40 p-2 rounded-md gap-10">
+        <h5 class="bg-gray-100 mb-2 p-2 rounded-md text-gray-500">Project Overview</h5>
+        <div class="flex justify-between items-center mb-2">
+            <div class="left text-2xl font-serif font-semibold italic">
+                {{project?.title}}
+            </div>
+            <div class="text-sm text-gray-500 italic">
+                {{project?.createdAt | date: 'medium' }} 
+            </div> 
+        </div>
+
+        <!-- Author Row -->
+        <div class="flex items-center mb-4 border-l-4 border-[#8B9F82] p-2 rounded-md gap-10">
+            <span class="flex justify-center items-center">
+                <fa-icon [icon]="faUser" class="text-gray-500 w-6 h-6"></fa-icon>
+                <p class="text-gray-500">Creator:</p>
+            </span>
+            
+            <div class="flex items-center justify-end">
+                <img [src]="project?.createdBy?.profile" alt="Author Profile" class="w-10 h-10 rounded-full mr-2" />
+                <span>{{ project?.createdBy?.firstName }} {{ project?.createdBy?.lastName }}</span>
+            </div>
+        </div>
+     </div>
+
+    <div class="flex justify-between items-center border-l-4 border-[#8B9F82] p-2 rounded-md mb-4">
+        <p class="font-bold text-gray-600">
+            {{note?.title}}
+        </p>
+        <p class="text-sm text-gray-500 italic">
+            {{note?.createdAt | date: 'medium' }}
+        </p>
+    </div>
+
+    <div class="flex justify-between items-center">       
+
+        <div class="mb-4">
+            <!-- Created At Row -->
+            <div class="flex items-center mb-4 border-l-4 border-[#8B9F82] p-2 rounded-md gap-10">
+                <span class="flex justify-center items-center">
+                    <fa-icon [icon]="faCalendar" class="text-gray-500 w-6 h-6"></fa-icon>
+                    <p class="text-gray-500">Created at:</p>
+                </span>
+                <p class="text-right italic text-gray-600">{{ note?.createdAt | date: 'medium' }}</p>
+            </div>
+            
+            <!-- Last Modified Row -->
+            <div class="flex items-center mb-4 border-l-4 border-[#8B9F82] p-2 rounded-md gap-10">
+                <span class="flex justify-center items-center">
+                    <fa-icon [icon]="faClock" class="text-gray-500 w-6 h-6"></fa-icon>
+                    <p class="text-gray-500">Last modified on:</p>
+                </span>
+                
+                <p class="text-right italic text-gray-600">{{ note?.updatedAt | date: 'medium' }}</p>
+            </div>
+        
+            <!-- Author Row -->
+            <div class="flex items-center mb-4 border-l-4 border-[#8B9F82] p-2 rounded-md gap-10">
+                <span class="flex justify-center items-center">
+                    <fa-icon [icon]="faUser" class="text-gray-500 w-6 h-6"></fa-icon>
+                    <p class="text-gray-500">Author:</p>
+                </span>
+                
+                <div class="flex items-center justify-end">
+                    <img [src]="note?.createdBy?.profile" alt="Author Profile" class="w-10 h-10 rounded-full mr-2" />
+                    <span>{{ note?.createdBy?.firstName }} {{ note?.createdBy?.lastName }}</span>
+                </div>
+            </div>
+        
+            <!-- Content Row -->
+            <div class="flex items-center mb-4 border-l-4 border-[#8B9F82] p-2 rounded-md gap-10">
+                <span class="flex justify-center items-center">
+                    <fa-icon [icon]="faFileAlt" class="text-gray-500 w-6 h-6"></fa-icon>
+                    <p class="text-gray-500">Content:</p>
+                </span>
+                
+                <p class="text-right italic border rounded-md px-4 py-2 text-gray-500 h-64 overflow-auto" [innerHTML]="note?.content"></p>
+            </div>
+        </div>
+    
+        
+        <!-- Attachments Section -->
+        <div class="mb-4">
+            <div class="flex items-center mb-4 border-l-4 border-r-4 border-[#8B9F82] p-2 rounded-md gap-4">
+                <!-- Attachments Text -->
+                <div class="flex flex-col justify-start">
+                    <span class="flex items-center gap-2 text-gray-500">
+                        <fa-icon [icon]="faPaperclip" class="text-gray-500 w-6 h-6"></fa-icon>
+                        <p class="text-gray-500 font-semibold">Attachments:</p>
+                    </span>
+                </div>
+                
+                <!-- Attachments Images -->
+                <div class="text-right border px-2 py-2 rounded-md bg-gray-50">
+                    <ul class="flex gap-2 flex-wrap">
+                        <li *ngFor="let attachment of note?.images" class="w-20 h-20">
+                            <img [src]="attachment" alt="Attachment" class="w-full h-full object-cover rounded-md" />
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    
+    <div class="actions flex gap-4">
+        <button class="border border-[#8B9F82]/30 flex justify-center items-center gap-2 text-sm rounded-md px-4 py-2 bg-[#8B9F82]/10"
+              [routerLink]='["/home/notes/edits", note?._id]'
+              >
+              <fa-icon [icon]="faEdit"></fa-icon>
+                <span>Edit Note</span>
+             </button>
+
+             <button class="border border-[#8B9F82]/30 flex justify-center items-center gap-2 text-sm rounded-md px-4 py-2 bg-[#8B9F82]/10"
+             (click)="showNoteRemoveModal = true"
+             >
+             <fa-icon [icon]="faTrashCan"></fa-icon>
+               <span>Delete Note</span>
+            </button>   
+    </div>
+
+    <!-- comment / review section -->
+     <ccnta-review [noteId]="noteId"></ccnta-review>
+</div>
+
+
+<!-- Remove Note Modal -->
+<div *ngIf="showNoteRemoveModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-red-50 p-6 rounded-lg shadow-xl border-2 border-red-200">
+      <h3 class="text-lg font-semibold mb-4">Remove Note</h3>
+      <p class="mb-4">Are you sure you want to remove the note "{{ note?.title }}"?</p>
+      <div class="flex justify-end space-x-4">
+        <button 
+          (click)="showNoteRemoveModal = false"
+          class="rounded-md text-sm gap-2 border bg-red-50 hover:bg-red-100 transition-colors text-red-500 flex justify-center items-center px-4">
+          <fa-icon [icon]="faTimesCircle" class="font-semibold "></fa-icon>
+          <span class="font-semibold">Cancel</span>
+        </button>
+  
+        <button 
+          (click)="removeNote()"
+          class="rounded-md px-4 py-2 text-sm flex justify-center items-center gap-1 border bg-[#8B9F82]/10 hover:bg-[#8B9F82]/20 transition-colors">
+          <svg width="20px" height="20px" viewBox="0 -0.5 25 25" fill="none" class="font-semibold text-[#8B9F82]" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5.5 12.5L10.167 17L19.5 8" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+          <span class="font-semibold text-[#8B9F82]">Remove</span>
+        </button>
+      </div>
+    </div>
+</div>

@@ -1,0 +1,138 @@
+<div class="grid grid-cols-1 md:grid-cols-5 h-[80vh] gap-4">
+  <!-- Main Editor Column -->
+  <div [ngClass]="{'col-span-4': hasImages, 'col-span-5': !hasImages}" class="flex flex-col">
+    <!-- Toolbar -->
+    <div class="bg-[#8B9F82]/50 p-2 flex flex-wrap space-x-1 items-center rounded-md">
+      <!-- Font Settings -->
+      <div class="flex items-center space-x-2">
+        <select 
+          (change)="changeFontFamily($event)"
+          class="px-2 py-1 border rounded"
+        >
+          <option>Arial</option>
+          <option>Times New Roman</option>
+          <option>Courier</option> 
+        </select>
+
+        <select 
+          (change)="changeFontSize($event)"
+          class="px-2 py-1 border rounded"
+        >
+          <option>8</option>
+          <option>10</option>
+          <option>12</option>
+          <option>14</option>
+          <option>16</option>
+          <option>18</option>
+        </select>
+
+        <button 
+          (click)="applyFormat('bold')" 
+          class="px-3 py-1 hover:bg-gray-200 rounded"
+        >
+          <strong>B</strong>
+        </button>
+        <button 
+          (click)="applyFormat('italic')" 
+          class="px-3 py-1 hover:bg-gray-200 rounded"
+        >
+          <em>I</em>
+        </button>
+        <button 
+          (click)="applyFormat('underline')" 
+          class="px-3 py-1 hover:bg-gray-200 rounded underline"
+        >
+          U
+        </button>
+      </div>
+
+      <!-- Text Formatting Options -->
+      <div class="flex items-center space-x-2">
+        <input 
+          type="color" 
+          (change)="changeTextColor($event)" 
+          class="w-10 h-10 p-0 border-none"
+        />
+        <button 
+          (click)="alignText('left')"
+          class="px-2 py-1 rounded hover:bg-gray-200"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="17" y1="10" x2="3" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="17" y1="18" x2="3" y2="18"></line></svg>
+        </button>
+        <button 
+          (click)="alignText('center')"
+          class="px-2 py-1 rounded hover:bg-gray-200"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="10" x2="6" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="18" y1="18" x2="6" y2="18"></line></svg>
+        </button>
+        <button 
+          (click)="alignText('right')"
+          class="px-2 py-1 rounded hover:bg-gray-200"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="21" y1="10" x2="7" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="21" y1="18" x2="7" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <!-- Insert Options -->
+      <div class="flex items-center space-x-2">
+        <button 
+          (click)="insertList('ul')" 
+          class="px-3 py-1 hover:bg-gray-200 rounded"
+        >
+          ●
+        </button>
+        <button 
+          (click)="insertList('ol')" 
+          class="px-3 py-1 hover:bg-gray-200 rounded"
+        >
+          1.
+        </button>
+        <button 
+          (click)="insertTable()" 
+          class="px-3 py-1 hover:bg-gray-200 rounded"
+        >
+          Table
+        </button>
+        <label class="px-3 py-1 hover:bg-gray-200 rounded cursor-pointer">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+          <input type="file" (change)="uploadImages($event)" multiple accept="image/*" class="hidden" />
+        </label>
+      </div>
+
+      <!-- History Controls -->
+      <div class="flex items-center space-x-2">
+        <button 
+          (click)="undo()" 
+          [disabled]="!canUndo"
+          class="px-3 py-1 hover:bg-gray-200 rounded disabled:opacity-50"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"></path><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path></svg>
+        </button>
+        <button 
+          (click)="redo()" 
+          [disabled]="!canRedo"
+          class="px-3 py-1 hover:bg-gray-200 rounded disabled:opacity-50"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 7v6h-6"></path><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"></path></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Editor -->
+    <div 
+      #editorContent 
+      contenteditable="true" 
+      class="flex-grow p-4 outline-none bg-white overflow-y-auto rounded-bl-md border"
+      (input)="onContentChanged($event)"
+    ></div>
+  </div>
+
+  <!-- Image Preview Column -->
+  <div *ngIf="savedImages.length > 0" class="col-span-1 bg-white p-4 rounded-md border">
+    <div  class="flex flex-col gap-2 mt-4">
+      <h3 class="text-md font-semibold mb-2 font-serif bg-gray-200 p-2 rounded-md">Saved Images</h3>
+      <img *ngFor="let image of savedImages" [src]="image" class="w-full h-auto object-cover rounded" />
+    </div>
+  </div>
+</div>
+

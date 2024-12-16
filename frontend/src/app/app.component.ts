@@ -1,30 +1,42 @@
-import { CommonModule } from "@angular/common";
-import { Component, OnInit, inject } from "@angular/core";
-import { RouterOutlet } from "@angular/router";
-import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { faMessage, faBell } from "@fortawesome/free-solid-svg-icons";
-import { Observable } from "rxjs";
-import { AuthService } from "./core/services/auth.service";
-import { SideNavComponent } from "./shared/components/side-nav/side-nav.component";
+import { Component, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
+import { AuthenticationService } from './core/services/authentication.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
-  selector: 'nta-root',
-  standalone: true,
-  imports: [CommonModule, FontAwesomeModule, SideNavComponent, RouterOutlet],
+  selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  styleUrl: './app.component.scss',
 })
 export class AppComponent implements OnInit {
-  protected faMessage = faMessage;
-  protected faBell = faBell;
-  protected authService: AuthService = inject(AuthService);
-  
-  isAuthenticated$: Observable<boolean>;
-  protected authenticatedUser:any;
+  protected user: any;
+  isExpanded: boolean = true;
 
-  ngOnInit() {
-    this.isAuthenticated$ = this.authService.isAuthenticated();
-
-    this. authenticatedUser= this.authService.authenticatedUser();
+  toggleNavigation() {
+    this.isExpanded = !this.isExpanded;
   }
+
+  constructor(
+    protected _authenticationService: AuthenticationService,
+  ) {
+  }
+
+  ngOnInit(): void {
+    this._authenticationService.authenticatedUser$.subscribe({
+      next: (user: any) => {
+        if (!user.name || !user.email || !user.profile) {
+          user = {
+            name: localStorage.getItem('name'),
+            email: localStorage.getItem('email'),
+            profile: localStorage.getItem('profile'),
+          };
+        }
+        this.user = user;
+      },
+      error: (error: HttpErrorResponse) => {
+        console.log(error);
+      },
+    });
+  }
+
 }

@@ -1,31 +1,54 @@
-import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
   Validators,
   AbstractControl,
   ValidationErrors,
-  ReactiveFormsModule,
 } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
+import { Router } from '@angular/router';
+import { AuthenticationService } from '../../services/authentication.service';
+import { ToastService } from '../../toast.service';
 
 @Component({
-  selector: 'nta-register',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  selector: 'ccnta-register',
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss',
 })
-export class RegisterComponent implements OnInit {
-  private authService: AuthService = inject(AuthService);
-  registrationForm!: FormGroup;
+export class RegisterComponent {
+  private authService: AuthenticationService = inject(AuthenticationService);
+  registrationForm: FormGroup;
   fileError: string | null = null;
   selectedFile: File | null = null;
   previewUrl: string | null = null;
 
-  constructor(private fb: FormBuilder, private router: Router) {}
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private _toastService: ToastService
+  ) {}
+
+  ngOnInit(): void {
+    this.authService.isAuthenticated$.subscribe((isAuthenticated) => {
+      if (isAuthenticated) {
+        this.router.navigate(['/home']);
+      }
+    });
+
+    this.registrationForm = this.fb.group(
+      {
+        firstName: ['', [Validators.required, Validators.minLength(2)]],
+        lastName: ['', [Validators.required, Validators.minLength(2)]],
+        email: ['', [Validators.required, Validators.email]],
+        password: ['', [Validators.required, this.passwordValidator]],
+        confirmPassword: ['', [Validators.required]],
+        profile: [null],
+      },
+      {
+        validators: this.matchPasswords('password', 'confirmPassword'),
+      }
+    );
+  }
 
   onFileChange(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -69,14 +92,6 @@ export class RegisterComponent implements OnInit {
     reader.readAsDataURL(file);
   }
 
-  // Custom Validator for Username
-  usernameValidator(control: AbstractControl): ValidationErrors | null {
-    const forbiddenUsernames = ['admin', 'test', 'user'];
-    return forbiddenUsernames.includes(control.value)
-      ? { forbiddenUsername: true }
-      : null;
-  }
-
   // Custom Validator for Password Strength
   passwordValidator(control: AbstractControl): ValidationErrors | null {
     const hasNumber = /\d/.test(control.value);
@@ -112,36 +127,6 @@ export class RegisterComponent implements OnInit {
     this.router.navigate(['/authentication']);
   }
 
-  ngOnInit(): void {
-    this.authService.isAuthenticated$.subscribe((isAuthenticated) => {
-      if (isAuthenticated) {
-        this.router.navigate(['/home']);
-      }
-    });
-
-    this.registrationForm = this.fb.group(
-      {
-        firstName: ['', [Validators.required, Validators.minLength(2)]],
-        lastName: ['', [Validators.required, Validators.minLength(2)]],
-        username: [
-          '',
-          [
-            Validators.required,
-            Validators.minLength(4),
-            this.usernameValidator,
-          ],
-        ],
-        email: ['', [Validators.required, Validators.email]],
-        password: ['', [Validators.required, this.passwordValidator]],
-        confirmPassword: ['', [Validators.required]],
-        profile: [null],
-      },
-      {
-        validators: this.matchPasswords('password', 'confirmPassword'),
-      }
-    );
-  }
-
   onSubmit() {
     if (this.registrationForm.valid) {
       const formData = new FormData();
@@ -149,9 +134,10 @@ export class RegisterComponent implements OnInit {
 
       formData.append('firstName', formValue.firstName);
       formData.append('lastName', formValue.lastName);
-      formData.append('username', formValue.username);
       formData.append('email', formValue.email);
       formData.append('password', formValue.password);
+      formData.append('confirmPassword', formValue.password);
+      localStorage.setItem('email', formValue.email);
 
       // Only append profile if a file was selected
       if (this.selectedFile) {
@@ -160,15 +146,16 @@ export class RegisterComponent implements OnInit {
 
       this.authService.register(formData).subscribe({
         next: () => {
-          this.router.navigate(['/login']);
+          localStorage.setItem('email', formValue.email);
+          this.router.navigate(['/auth/validate-token']);
         },
         error: (error) => {
+          this._toastService.show(error.error.message, 'DANGER', null);
           console.error('Registration failed', error);
         },
       });
     } else {
       this.registrationForm.markAllAsTouched();
-      console.log('Form is invalid', this.registrationForm.errors);
     }
   }
 }

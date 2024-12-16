@@ -1,9 +1,13 @@
-import { daisyui } from "daisyui";
-
 module.exports = {
-  content: ["./src/**/*.{html,ts}"],
+  content: [
+    "./src/**/*.{html,ts}",
+  ],
   theme: {
-    extend: {},
+    extend: {
+      // fontFamily: {
+      //   sans: ['Inter', 'sans-serif'],
+      // },
+    },
   },
-  plugins: [require("daisyui")],
-};
+  plugins: [],
+}

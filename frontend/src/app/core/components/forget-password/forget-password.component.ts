@@ -1,202 +1,91 @@
-import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { FormsModule, NgForm, ReactiveFormsModule } from '@angular/forms';
+import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-
-import { faEyeSlash, faEye } from '@fortawesome/free-solid-svg-icons';
+import { AuthenticationService } from '../../services/authentication.service';
 
 @Component({
-  selector: 'nta-forget-password',
-  standalone: true,
-  imports: [CommonModule, FontAwesomeModule, FormsModule, ReactiveFormsModule],
-  template: `
-  <div
-      class="min-h-screen bg-white flex flex-col justify-center py-12 sm:px-6 lg:px-8"
+  selector: 'ccnta-forget-password',
+  template:  `
+
+    <div
+      class="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center px-4"
     >
-      <div class="sm:mx-auto sm:w-full sm:max-w-md">
-        
-        <!-- LOGO -->
-        <svg class="mx-auto h-12 w-auto text-[#8B9F82]" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-          <!-- Notebook Shape -->
-          <rect x="3" y="3" width="18" height="18" rx="2" ry="2" fill="currentColor" />
-          <!-- Lines for Notes -->
-          <line x1="6" y1="8" x2="18" y2="8" stroke="white" stroke-width="1.5" />
-          <line x1="6" y1="12" x2="18" y2="12" stroke="white" stroke-width="1.5" />
-          <line x1="6" y1="16" x2="14" y2="16" stroke="white" stroke-width="1.5" />
-          <!-- Pen Icon -->
-          <path d="M20 3l1 1-7 7-1-1 7-7z" fill="white" />
-          <path d="M19 4l1 1-1 1-1-1 1-1z" fill="white" />
-        </svg>
-
-        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-600">
-          Setup your new password
-        </h2>
-      </div>
-
-      <div class="mt-4 sm:mx-auto sm:w-full sm:max-w-md">
-        <div class="bg-white py-8 px-4 shadow-sm sm:rounded-md sm:px-10">
-          <form
-            class="space-y-6"
-            #loginForm="ngForm"
-            (ngSubmit)="onSubmits(loginForm)"
+      <div class="bg-white rounded-xl shadow-lg w-full max-w-md p-4">
+        <div class="py-6 px-4">
+          <svg
+            class="mx-auto h-12 w-auto text-[#8B9F82]"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            xmlns="http://www.w3.org/2000/svg"
           >
-            <div class="mb-6">
+            <rect
+              x="3"
+              y="3"
+              width="18"
+              height="18"
+              rx="2"
+              ry="2"
+              fill="currentColor"
+            />
+            <line x1="6" y1="8" x2="18" y2="8" stroke="white" stroke-width="1.5" />
+            <line
+              x1="6"
+              y1="12"
+              x2="18"
+              y2="12"
+              stroke="white"
+              stroke-width="1.5"
+            />
+            <line
+              x1="6"
+              y1="16"
+              x2="14"
+              y2="16"
+              stroke="white"
+              stroke-width="1.5"
+            />
+            <path d="M20 3l1 1-7 7-1-1 7-7z" fill="white" />
+            <path d="M19 4l1 1-1 1-1-1 1-1z" fill="white" />
+          </svg>
+
+          <h2 class="mt-4 text-center text-2xl font-bold text-gray-900">
+            Forget your password?
+          </h2>
+
+          <form
+            class="mt-6 space-y-4"
+            #form="ngForm"
+            (ngSubmit)="onSubmits(form)"
+          >
+            <div>
               <label
-                for="username"
+                for="email"
                 class="block mb-2 text-sm font-medium"
-                [ngClass]="{
-                  'text-red-700 dark:text-red-500':
-                    username.invalid && username.touched
-                }"
+                [ngClass]="{ 'text-red-700': email.invalid && email.touched }"
               >
-                Username
+                Email
               </label>
               <input
-                type="text"
-                id="username"
-                name="username"
-                [(ngModel)]="model.username"
-                #username="ngModel"
+                type="email"
+                id="email"
+                name="email"
+                [(ngModel)]="model.email"
+                #email="ngModel"
                 required
                 minlength="3"
-                class="border text-sm rounded-lg block w-full p-2.5 focus:outline-none outline-none"
+                class="border text-sm rounded-lg block w-full p-2 outline-none"
                 [ngClass]="{
-                  'bg-red-50 border-red-500 text-red-900 placeholder-red-700':
-                    username.invalid && username.touched
+                  'bg-red-50 border-red-500 text-red-900 placeholder-red-700 focus:ring-red-500 focus:border-red-500':
+                    email.invalid && email.touched
                 }"
-                placeholder="Username"
+                placeholder="Email"
               />
               <div
-                class="error-messages text-sm text-red-600 dark:text-red-500"
-                *ngIf="username.invalid && username.touched"
+                class="text-sm text-red-600 mt-1"
+                *ngIf="email.invalid && email.touched"
               >
-                <small *ngIf="username.errors?.['required']" class="font-semibold">
-                  * Username is required
-                </small>
-              </div>
-            </div>
-
-            <div class="mb-6">
-              <label
-                for="password"
-                class="block mb-2 text-sm font-medium"
-                [ngClass]="{
-                  'text-red-700 dark:text-red-500':
-                    password.invalid && password.touched
-                }"
-              >
-                Password
-              </label>
-
-              <div class="relative">
-                <input
-                  [type]="showPassword ? 'text' : 'password'"
-                  id="password"
-                  name="password"
-                  [(ngModel)]="model.password"
-                  #password="ngModel"
-                  required
-                  minlength="8"
-                  class="border text-sm rounded-lg block w-full p-2.5 focus:outline-none outline-none"
-                  [ngClass]="{
-                    'bg-red-50 border-red-500 text-red-900 dark:text-red-400 placeholder-red-700':
-                      password.invalid && password.touched
-                  }"
-                  placeholder="Password"
-                />
-                <button
-                  type="button"
-                  class="password-toggle absolute inset-y-0 right-0 pr-3 flex items-center"
-                  (click)="togglePasswordVisibility()"
-                  [attr.aria-label]="
-                    showPassword ? 'Hide password' : 'Show password'
-                  "
-                >
-                  @if(showPassword){
-                  <fa-icon [icon]="faEyeSlash" class="text-gray-500"></fa-icon>
-                  }@else {
-                  <fa-icon [icon]="faEye" class="text-gray-500"></fa-icon>
-                  }
-                </button>
-              </div>
-              <div
-                class="error-messages text-sm text-red-600 dark:text-red-500"
-                *ngIf="password.invalid && password.touched"
-              >
-                <small
-                  *ngIf="password.errors?.['required']"
-                  class="font-semibold"
-                >
-                  * Password is required
-                </small>
-                <small
-                  *ngIf="password.errors?.['minlength']"
-                  class="font-semibold"
-                >
-                  * Minimum 8 characters.
-                </small>
-              </div>
-            </div>
-
-            <div class="mb-6">
-              <label
-                for="confirmPassword"
-                class="block mb-2 text-sm font-medium"
-                [ngClass]="{
-                  'text-red-700 dark:text-red-500':
-                    confirmPassword.invalid && confirmPassword.touched
-                }"
-              >
-                Confirm Password
-              </label>
-
-              <div class="relative">
-                <input
-                  [type]="showPasswordConfirm ? 'text' : 'password'"
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  [(ngModel)]="model.confirmPassword"
-                  #confirmPassword="ngModel"
-                  required
-                  minlength="8"
-                  class="border text-sm rounded-lg block w-full p-2.5 focus:outline-none outline-none"
-                  [ngClass]="{
-                    'bg-red-50 border-red-500 text-red-900 dark:text-red-400 placeholder-red-700':
-                      confirmPassword.invalid && confirmPassword.touched
-                  }"
-                  placeholder="Confirm Password"
-                />
-                <button
-                  type="button"
-                  class="password-toggle absolute inset-y-0 right-0 pr-3 flex items-center"
-                  (click)="toggleConfirmPasswordVisibility()"
-                  [attr.aria-label]="
-                    showPasswordConfirm ? 'Hide password' : 'Show password'
-                  "
-                >
-                  @if(showPasswordConfirm){
-                  <fa-icon [icon]="faEyeSlash" class="text-gray-500"></fa-icon>
-                  }@else {
-                  <fa-icon [icon]="faEye" class="text-gray-500"></fa-icon>
-                  }
-                </button>
-              </div>
-              <div
-                class="error-messages text-sm text-red-600 dark:text-red-500"
-                *ngIf="confirmPassword.invalid && confirmPassword.touched"
-              >
-                <small
-                  *ngIf="confirmPassword.errors?.['required']"
-                  class="font-semibold"
-                >
-                  * Confirm Password is required
-                </small>
-                <small
-                  *ngIf="confirmPassword.errors?.['minlength']"
-                  class="font-semibold"
-                >
-                  * Minimum 8 characters. ]</small
+                <small *ngIf="email.errors?.['required']" class="font-semibold"
+                  >* Email is required</small
                 >
               </div>
             </div>
@@ -204,55 +93,59 @@ import { faEyeSlash, faEye } from '@fortawesome/free-solid-svg-icons';
             <div>
               <button
                 type="submit"
-                [disabled]="loginForm.form.invalid || isLoading"
-                class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#8B9F82] hover:bg-[#8B9F82]/95 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed outline-none"
+                [disabled]="form.form.invalid || isLoading"
+                class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md text-sm font-medium text-white bg-[#8B9F82] hover:bg-[#8B9F82]/95 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {{ isLoading ? 'Requesting...' : 'Reset password' }}
+                {{ isLoading ? "Sending..." : "Request" }}
               </button>
             </div>
           </form>
         </div>
       </div>
     </div>
-  
+
   `,
-  styles: []
+  styles: [],
 })
 export class ForgetPasswordComponent {
-
-  private _router:Router = inject(Router);
-
-  faEyeSlash = faEyeSlash;
-  faEye = faEye;
+  private _router: Router = inject(Router);
+  private _authenticationService: AuthenticationService = inject(
+    AuthenticationService
+  );
 
   model = {
-    username: '',
-    password: '',
-    confirmPassword: '',
+    email: '',
   };
 
   isLoading = false;
-  showPassword = false;
-  showPasswordConfirm = false;
+
+  constructor(){
+    this._authenticationService.isAuthenticated$
+    .subscribe((isAuthenticated) => {
+      if (isAuthenticated) {
+        this._router.navigate(['/home']);
+      }
+    });
+  }
 
   onSubmits(form: NgForm) {
     if (form.valid) {
       this.isLoading = true;
-      console.log(this.model);
-      setTimeout(() => {
-        this.isLoading = false;
-      }, 1000);
 
-      this._router.navigate(['/authentication'])
+      this._authenticationService
+        .forgetPasswordRequest(this.model.email)
+        .subscribe({
+          next: () => {
+            this._router.navigate(['/auth/forget-password-request']);
+          },
+          error: (error) => {
+            console.error('Error sending forget password request', error);
+          },
+          complete: () => {
+            form.resetForm();
+            this.isLoading = false;
+          },
+        });
     }
   }
-
-  togglePasswordVisibility() {
-    this.showPassword = !this.showPassword;
-  }
-
-  toggleConfirmPasswordVisibility() {
-    this.showPasswordConfirm = !this.showPasswordConfirm;
-  }
-
 }

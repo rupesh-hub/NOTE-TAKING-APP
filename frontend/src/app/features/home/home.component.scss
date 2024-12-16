@@ -1,0 +1,55 @@
+/* project-dashboard.component.css */
+/* Custom Scrollbar Styles */
+.project-scrollbar,
+.task-scrollbar,
+.notes-scrollbar,
+.activity-scrollbar {
+  max-height: 500px;
+  overflow-y: auto;
+  padding-right: 8px;
+  scrollbar-width: thin; /* For Firefox */
+  scrollbar-color: transparent transparent; /* For Firefox */
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.project-scrollbar::-webkit-scrollbar,
+.task-scrollbar::-webkit-scrollbar,
+.notes-scrollbar::-webkit-scrollbar,
+.activity-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Show scrollbar on hover */
+.project-scrollbar:hover::-webkit-scrollbar,
+.task-scrollbar:hover::-webkit-scrollbar,
+.notes-scrollbar:hover::-webkit-scrollbar,
+.activity-scrollbar:hover::-webkit-scrollbar {
+  display: block;
+  width: 6px;
+  height: 6px;
+}
+
+.project-scrollbar:hover::-webkit-scrollbar-track,
+.task-scrollbar:hover::-webkit-scrollbar-track,
+.notes-scrollbar:hover::-webkit-scrollbar-track,
+.activity-scrollbar:hover::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.project-scrollbar:hover::-webkit-scrollbar-thumb,
+.task-scrollbar:hover::-webkit-scrollbar-thumb,
+.notes-scrollbar:hover::-webkit-scrollbar-thumb,
+.activity-scrollbar:hover::-webkit-scrollbar-thumb {
+  background: #8B9F82;
+  border-radius: 10px;
+  transition: background 0.3s ease;
+}
+
+/* Optional: Add a hover effect */
+.project-scrollbar:hover::-webkit-scrollbar-thumb:hover,
+.task-scrollbar:hover::-webkit-scrollbar-thumb:hover,
+.notes-scrollbar:hover::-webkit-scrollbar-thumb:hover,
+.activity-scrollbar:hover::-webkit-scrollbar-thumb:hover {
+  background: #6a8462;
+}

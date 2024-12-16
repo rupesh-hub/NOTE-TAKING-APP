@@ -1,125 +1,171 @@
-const express = require("express");
-const errorHandler = require("./middleware/ErrorHandler");
-const connectDb = require("./config/DbConnection");
-const upload = require('./config/FileUpload');
-const Role = require("./models/RoleModel");
-const { Permission, Authority } = require('./models/AuthorityModel');
-require("dotenv").config();
-const cors = require('cors');
-const path = require('path');
+import express from "express";
+import http from "http";
+import { Server } from "socket.io";
+import { connectDB } from "./database/db.connection.js";
+import dotenv from "dotenv";
+import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
+import authRoutes from "./user/routes/auth.route.js";
+import { errorHandler } from "./exception/error.handler.js";
+import cookieParser from "cookie-parser";
+import projectRoutes from "./project/route/project.route.js";
+import authorityRoutes from "./authority/route/authority.route.js";
+import notesRoutes from "./note/route/note.routes.js";
+import collaboratorRoutes from "./collaborator/route/collaborator.routes.js";
+import userRoutes from "./user/routes/user.routes.js";
+import { LoggingService } from "./activitylog/service/logging.service.js";
+import loggingRoutes from "./activitylog/route/logging.routes.js";
+import { socketAuthMiddleware } from "./middleware/socket-auth.middleware.js";
+import { Note } from "./note/model/note.model.js";
+import notificationRoutes from './notification/route/notification.routes.js';
+import reviewsRoutes from './review/route/comment.routes.js';
 
-// CORS configuration
-const corsOptions = {
-  origin: 'http://localhost:4200',  // Frontend URL (adjust if needed)
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,  // Allow cookies to be sent with requests
-};
+dotenv.config();
 
-connectDb();
 const app = express();
-app.use(cors(corsOptions));
 const port = process.env.PORT || 3001;
 
-// app.use('/uploads', express.static('uploads')); 
-// Serve static files
-app.use('/api/v1.0.0/uploads', express.static(path.join(__dirname, 'uploads')));
-
-// MIDDLEWARE
+// Middleware
 app.use(express.json());
-app.use("/api/v1.0.0/notes", require("./routes/NoteRoutes"));
-app.use("/api/v1.0.0/drafts", upload.array('images', 10), require("./routes/DraftRoutes"));
-app.use("/api/v1.0.0/users",upload.single('profile'), require("./routes/UserRoutes"));
-app.use("/api/v1.0.0/projects", require("./routes/ProjectRoutes"));
+
+const corsOptions = {
+  origin: "http://localhost:4200",
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: [
+    "Content-Type",
+    "Authorization",
+    "Access-Control-Allow-Credentials",
+  ],
+};
+
+app.use(cors(corsOptions));
+app.use(cookieParser());
+
+// Initialize logging service
+LoggingService.initialize({ enableLogging: true });
+
+// Define __dirname in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Serve static files
+app.use("/api/v1.0.0/uploads", express.static(path.join(__dirname, "uploads")));
+
+// Routes
+app.use("/api/v1.0.0/auth", authRoutes);
+app.use("/api/v1.0.0/users", userRoutes);
+app.use("/api/v1.0.0/projects", projectRoutes);
+app.use("/api/v1.0.0/authorities", authorityRoutes);
+app.use("/api/v1.0.0/notes", notesRoutes);
+app.use("/api/v1.0.0/collaborators", collaboratorRoutes);
+app.use("/api/v1.0.0/logs", loggingRoutes);
+app.use("/api/v1.0.0/notifications", notificationRoutes);
+app.use("/api/v1.0.0/comments", reviewsRoutes);
+
+// Error handling middleware
 app.use(errorHandler);
 
-// Initialize authorities and permissions
-const permissions = [
-  { name: "view_project", description: "View projects" },
-  { name: "create_project", description: "Create new projects" },
-  { name: "edit_project", description: "Edit project details" },
-  { name: "delete_project", description: "Delete projects" },
-  { name: "view_note", description: "View notes within projects" },
-  { name: "create_note", description: "Create new notes in projects" },
-  { name: "edit_note", description: "Edit notes" },
-  { name: "delete_note", description: "Delete notes" },
-  { name: "manage_collaborators", description: "Add or remove collaborators" },
-  {
-    name: "assign_authorities",
-    description: "Assign authorities to collaborators",
+// Create HTTP server
+const server = http.createServer(app);
+
+// Socket.IO Configuration
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:4200",
+    methods: ["GET", "POST"],
+    credentials: true, // Allow cookies
   },
-];
+});
+io.use(socketAuthMiddleware);
 
-const authorities = [
-  {
-    name: "Viewer",
-    permissions: ["view_project", "view_note"],
-  },
-  {
-    name: "Editor",
-    permissions: [
-      "view_project",
-      "view_note",
-      "create_note",
-      "edit_note",
-      "delete_note",
-    ],
-  },
-  {
-    name: "Owner",
-    permissions: permissions.map((p) => p.name),
-  },
-];
-
-// Function to initialize authorities and permissions
-async function initializeAuthorities() {
-  try {
-    // Clear existing permissions and authorities
-    await Permission.deleteMany({});
-    await Authority.deleteMany({});
-
-    // Insert permissions
-    const createdPermissions = await Permission.insertMany(permissions);
-
-    // Create authorities with references to permissions
-    const authoritiesToCreate = authorities.map((auth) => ({
-      name: auth.name,
-      permissions: createdPermissions
-        .filter((p) => auth.permissions.includes(p.name))
-        .map((p) => p._id),
-    }));
-
-    await Authority.insertMany(authoritiesToCreate);
-
-    console.log("Authorities and Permissions initialized successfully");
-  } catch (error) {
-    console.error("Error initializing authorities and permissions:", error);
-  }
-}
-
-async function addRoleIfNotExists(roleName) {
-  try {
-    const role = await Role.findOne({ name: roleName });
-    if (!role) {
-      await Role.create({ name: roleName });
-      console.log(`Role '${roleName}' added to the database.`);
-    }
-  } catch (error) {
-    console.error(`Error adding role '${roleName}':`, error.message);
-  }
-}
-
-// Initialize roles and start the server
-(async function initializeServer() {
-  const rolesToAdd = ["admin", "user", "editor"];
-  for (const roleName of rolesToAdd) {
-    await addRoleIfNotExists(roleName);
-  }
-
-  // Initialize authorities and permissions
-  initializeAuthorities();
-
-  app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+// Socket.IO connection handler
+io.on("connection", (socket) => {
+  let saveNoteTimeout;
+  // Join a project room
+  socket.on("join-project", (projectId) => {
+    socket.join(projectId);
+    // Notify others in the room about the new connection (optional)
+    socket.to(projectId).emit("user-joined", {
+      message: `A new user has joined project room: ${projectId}`,
+    });
   });
-})();
+
+  socket.on("join-review", (noteId) => {
+    console.log(`User joined note room: ${noteId}`)
+    socket.join(noteId);
+  });
+
+  // Handle real-time note updates
+  socket.on("note-update", (updateData) => {
+    try {
+      const { noteId, projectId, updates } = updateData;
+
+      // Ensure updates object is valid
+      if (!updates || typeof updates !== "object") {
+        throw new Error("Invalid updates object");
+      }
+
+      // Broadcast update to all users in the project room (except sender)
+      socket.to(projectId).emit("note-updated", {
+        noteId,
+        updates,
+        userId: socket.user?.userId || "anonymous", // Include user ID if available
+      });
+
+      // Debounce the save operation to prevent multiple database writes
+      if (saveNoteTimeout) clearTimeout(saveNoteTimeout);
+
+      saveNoteTimeout = setTimeout(async () => {
+        await saveNoteToDatabase(noteId, updates);
+      }, 500);
+    } catch (error) {
+      console.error("Error broadcasting note update:", error);
+
+      // Notify the sender about the error
+      socket.emit("update-error", {
+        message: "Failed to broadcast note update",
+        error: error.message,
+      });
+    }
+  });
+
+  socket.on("join-topic", () => {
+    const email = socket.user.email;
+    console.log("Joining room:", email);
+    socket.join(email);
+  });
+
+  // Handle user disconnecting (optional)
+  socket.on("disconnect", () => {
+    console.log(`User disconnected`);
+  });
+});
+
+// Start the server
+server.listen(port, () => {
+  connectDB();
+  console.log(`Server is running on ${port}`);
+});
+
+// Function to save the note to the database
+async function saveNoteToDatabase(noteId, updates) {
+  try {
+    const note = await Note.findOne({ _id: noteId });
+
+    if (!note) {
+      console.error("Note not found:", noteId);
+      return;
+    }
+
+    // Update note fields
+    note.content = updates.content || note.content;
+
+    // Save the updated note
+    await note.save();
+  } catch (error) {}
+}
+
+// Export for potential use in other files
+export { io, app, server };

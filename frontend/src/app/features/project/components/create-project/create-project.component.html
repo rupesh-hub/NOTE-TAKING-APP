@@ -1,0 +1,163 @@
+
+<div class="min-h-[75vh] flex justify-center items-center">
+    <div class="p-6 bg-gray-50 rounded-lg w-[50%]">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Create New Project</h2>
+        
+        <form [formGroup]="projectForm" (ngSubmit)="saveProject()" class="space-y-6">
+          <div class="grid grid-cols-1 gap-4">
+            <!-- Project Name -->
+            <div>
+              <label for="projectName" class="block text-sm font-medium text-gray-700 mb-2">
+                Project Name
+              </label>
+              <input 
+                type="text" 
+                id="projectName" 
+                formControlName="projectName"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none"
+                placeholder="Enter project name"
+              />
+              <div *ngIf="projectName?.invalid && (projectName?.dirty || projectName?.touched)" class="text-red-500 text-sm mt-1">
+                <small *ngIf="projectName?.errors?.['required']">Project name is required</small>
+                <small *ngIf="projectName?.errors?.['minlength']">Project name must be at least 3 characters</small>
+                <small *ngIf="projectName?.errors?.['maxlength']">Project name cannot exceed 100 characters</small>
+              </div>
+            </div>
+      
+            <!-- Project Description -->
+            <div>
+              <label for="projectDescription" class="block text-sm font-medium text-gray-700 mb-2">
+                Project Description
+              </label>
+              <textarea 
+                id="projectDescription" 
+                formControlName="projectDescription"
+                rows="4" 
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none"
+                placeholder="Enter project description"
+              ></textarea>
+              <div *ngIf="projectDescription?.invalid && (projectDescription?.dirty || projectDescription?.touched)" class="text-red-500 text-sm mt-1">
+                <small *ngIf="projectDescription?.errors?.['required']">Project description is required</small>
+                <small *ngIf="projectDescription?.errors?.['minlength']">Description must be at least 10 characters</small>
+                <small *ngIf="projectDescription?.errors?.['maxlength']">Description cannot exceed 500 characters</small>
+              </div>
+            </div>
+      
+            <!-- User Search -->
+            <form [formGroup]="userAssignmentForm">
+              <div>
+                <label for="assignedUsers" class="block text-sm font-medium text-gray-700 mb-2">
+                  Assign Users
+                </label>
+                <div class="relative">
+                  <input 
+                    type="text" 
+                    id="assignedUsers" 
+                    formControlName="userSearch"
+                    placeholder="Search users by email..."
+                    (keyup.enter)="searchUserByEmail()"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none"
+                  />
+                  
+                  <!-- Email Validation Error -->
+                  <p 
+                    *ngIf="userAssignmentForm.get('userSearch')?.invalid && 
+                           userAssignmentForm.get('userSearch')?.touched" 
+                    class="text-red-500 text-xs mt-1"
+                  >
+                    Please enter a valid email address
+                  </p>
+                  
+                  <!-- User Dropdown -->
+                  <div *ngIf="isDropdownOpen && filteredUsers.length" 
+                       class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
+                    <ul class="divide-y divide-gray-200">
+                      <li 
+                        *ngFor="let user of filteredUsers" 
+                        (click)="toggleUserSelection(user)"
+                        class="px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center justify-between"
+                      >
+                        <div class="flex items-center space-x-3">
+                          <img 
+                            [src]="user.profile" 
+                            alt="User" 
+                            class="w-10 h-10 rounded-full object-cover"
+                          />
+                          <div>
+                            <p class="text-sm font-medium text-gray-900">
+                              {{ getFullName(user) }}
+                            </p>
+                            <p class="text-xs text-gray-500">{{ user.email }}</p>
+                          </div>
+                        </div>
+                        <svg *ngIf="isUserSelected(user)" class="w-6 h-6 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                        </svg>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Assigned Users -->
+              <div *ngIf="assignedUsers.length" class="bg-gray-50 p-4 rounded-md mt-4">
+                <h3 class="text-sm font-semibold text-gray-700 mb-3">Assigned Users</h3>
+                <div class="flex flex-wrap gap-3">
+                  <div *ngFor="let user of assignedUsers" class="relative">
+                    <img 
+                      [src]="user.profile" 
+                      [alt]="getFullName(user)"
+                      class="w-10 h-10 rounded-full object-cover border-2 border-green-500"
+                    />
+                    <button 
+                      type="button"
+                      (click)="removeAssignedUser(user)"
+                      class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
+                    >
+                      &times;
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Role Assignments -->
+              <div *ngIf="assignedUsers.length" class="space-y-3 mt-4">
+                <h3 class="text-sm font-semibold text-gray-700 mb-3">Role Assignments</h3>
+                <div *ngFor="let user of assignedUsers" class="flex items-center space-x-3">
+                  <img 
+                    [src]="user.profile" 
+                    [alt]="getFullName(user)"
+                    class="w-10 h-10 rounded-full object-cover"
+                  />
+                  <span class="flex-grow text-sm text-gray-700">
+                    {{ getFullName(user) }}
+                  </span>
+                  <select 
+                    (change)="assignRole(user, $event)"
+                    class="w-48 px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none"
+                  >
+                    <option value="">Select a role</option>
+                    <option *ngFor="let authority of authorities" 
+                      [value]="authority.name"
+                      class="uppercase italic font-serif">
+                      {{ authority.name }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+            </form>
+    
+          <!-- Submit Button -->
+          <button 
+            type="submit" 
+            [disabled]="projectForm.invalid || isSubmitting"
+            class="w-full py-3 bg-[#8B9F82]/90 text-white font-semibold rounded-md 
+                   hover:bg-[#8B9F82] transition-colors focus:outline-none 
+                   disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {{ isSubmitting ? 'Creating...' : 'Create Project' }}
+          </button>
+        </div>
+      </form>
+    </div>
+</div>
